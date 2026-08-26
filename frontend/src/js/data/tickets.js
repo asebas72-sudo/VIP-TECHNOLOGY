@@ -89,3 +89,81 @@ export async function crearIngreso(form) {
 
   return resultado;
 }
+
+/**
+ * Lista los tickets con todo lo que necesita el dashboard de Reparaciones.
+ * No hay que filtrar "solo mis tickets" a mano como en legacy/Code.js
+ * (getReparacionesBackend): la política RLS `tickets_select` ya solo
+ * devuelve lo que el usuario logueado puede ver (todo si es admin,
+ * lo suyo + lo sin asignar si es técnico).
+ */
+export async function listarTickets() {
+  const { data, error } = await supabase
+    .from('tickets')
+    .select(
+      `id, codigo, estado, equipo, fallas, observaciones, accesorios,
+       celular, correo_cliente, costo, observacion_final, comentario_1, comentario_2,
+       firma_url, imagen_recepcion_url, fecha_ingreso, fecha_reparacion, fecha_entrega_estimada,
+       tecnico_id,
+       cliente:clientes(nombre, celular, correo),
+       marca:marcas(nombre),
+       tipo:tipos_equipo(nombre),
+       tecnico:perfiles(nombre, celular),
+       fotos:ticket_fotos(id, url, orden)`
+    )
+    .order('fecha_ingreso', { ascending: false });
+
+  if (error) throw error;
+  return (data || []).map((t) => ({ ...t, fotos: (t.fotos || []).sort((a, b) => a.orden - b.orden) }));
+}
+
+const MAX_FOTOS = 5;
+
+/**
+ * Guarda la ficha técnica de un ticket: campos editables + gestión de fotos
+ * (mantiene las que el técnico no quitó, sube las nuevas, borra las quitadas).
+ * Equivalente a updateReparacionBackend() de legacy/Code.js.
+ *
+ * @param {object} params
+ * @param {number} params.ticketId
+ * @param {string} params.codigo
+ * @param {object} params.cambios          campos planos para tickets.update()
+ * @param {{id:number,url:string}[]} params.fotosOriginales  lo que ya había antes de abrir el modal
+ * @param {{id:number,url:string}[]} params.fotosAConservar  subconjunto de las originales que el técnico dejó
+ * @param {Blob[]} params.fotosNuevas
+ */
+export async function guardarFichaReparacion({ ticketId, codigo, cambios, fotosOriginales, fotosAConservar, fotosNuevas }) {
+  const idsConservar = new Set((fotosAConservar || []).map((f) => f.id));
+  const fotosABorrar = (fotosOriginales || []).filter((f) => !idsConservar.has(f.id));
+
+  if (fotosABorrar.length) {
+    await supabase
+      .from('ticket_fotos')
+      .delete()
+      .in(
+        'id',
+        fotosABorrar.map((f) => f.id)
+      );
+  }
+
+  const cupoDisponible = MAX_FOTOS - (fotosAConservar || []).length;
+  const aSubir = (fotosNuevas || []).slice(0, Math.max(cupoDisponible, 0));
+  let ordenSiguiente = (fotosAConservar || []).reduce((max, f) => Math.max(max, f.orden || 0), 0) + 1;
+
+  for (const blob of aSubir) {
+    const url = await subirArchivo(`${codigo}/reparacion-${Date.now()}-${ordenSiguiente}.jpg`, blob);
+    const { error: errFoto } = await supabase
+      .from('ticket_fotos')
+      .insert({ ticket_id: ticketId, url, orden: ordenSiguiente });
+    if (errFoto) throw errFoto;
+    ordenSiguiente += 1;
+  }
+
+  const { data, error } = await supabase.from('tickets').update(cambios).eq('id', ticketId).select('id').maybeSingle();
+  if (error) throw error;
+  if (!data) {
+    throw new Error('No tienes permiso para editar este ticket (está asignado a otro técnico).');
+  }
+
+  return { ok: true };
+}

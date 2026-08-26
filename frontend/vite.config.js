@@ -3,7 +3,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // GitHub Pages sirve el sitio en /<repo>/ en vez de la raíz del dominio.
 // Cambia BASE_PATH si el repo se llama distinto a "VIP".
-const BASE_PATH = process.env.BASE_PATH || '/VIP/';
+const BASE_PATH = process.env.BASE_PATH || '/VIP-TECHNOLOGY/';
 
 export default defineConfig({
   base: BASE_PATH,

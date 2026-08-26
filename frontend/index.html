@@ -8,7 +8,7 @@
   <title>VIP TECHNOLOGY</title>
   <link rel="stylesheet" href="/src/styles/tailwind.css" />
 </head>
-<body class="bg-slate-100 text-slate-900 font-sans">
+<body class="overflow-x-hidden bg-slate-100 text-slate-900 font-sans">
 
   <!-- Pantalla de login: vista completa e independiente, no un modal encima del menú -->
   <div id="login-screen"
@@ -46,16 +46,16 @@
 
   <!-- Shell de la app: solo visible después de iniciar sesión -->
   <div id="app-shell" class="mx-auto hidden max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-    <header class="mb-6 flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
-      <img id="header-logo" alt="VIP Technology" class="h-10 w-10 rounded-lg border border-slate-200 object-cover" />
-      <div class="flex flex-col">
-        <span class="text-lg font-extrabold tracking-wide text-slate-900">VIP TECHNOLOGY</span>
-        <span class="text-xs font-medium text-slate-500">Servicio Técnico Especializado</span>
+    <header class="mb-6 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:gap-4 sm:px-5 sm:py-3">
+      <img id="header-logo" alt="VIP Technology" class="h-9 w-9 flex-shrink-0 rounded-lg border border-slate-200 object-cover sm:h-10 sm:w-10" />
+      <div class="flex min-w-0 flex-col">
+        <span class="truncate text-sm font-extrabold tracking-wide text-slate-900 sm:text-lg">VIP TECHNOLOGY</span>
+        <span class="hidden truncate text-xs font-medium text-slate-500 sm:block">Servicio Técnico Especializado</span>
       </div>
-      <span id="user-badge" class="ml-2 text-xs text-slate-400"></span>
+      <span id="user-badge" class="hidden truncate text-xs text-slate-400 md:ml-2 md:inline"></span>
       <button id="logout-btn"
-              class="ml-auto rounded-md border border-accent px-3 py-1.5 text-xs font-bold text-accent transition hover:bg-accent hover:text-white">
-        🚪 Cerrar sesión
+              class="ml-auto flex flex-shrink-0 items-center gap-1.5 rounded-md border border-accent px-2 py-1.5 text-xs font-bold text-accent transition hover:bg-accent hover:text-white sm:px-3">
+        <span>🚪</span><span class="hidden sm:inline">Cerrar sesión</span>
       </button>
     </header>
 

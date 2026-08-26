@@ -144,14 +144,27 @@ export async function render(container, { navigate }) {
       .join('');
   }
 
+  // Prioridad de orden: INGRESADO primero, ENTREGADO al final — igual que
+  // prioridadEstadoRep() en legacy/ReparacionesDashboard.html.
+  function prioridadEstado(estado) {
+    if (estado === 'INGRESADO') return 0;
+    if (estado === 'ENTREGADO') return 2;
+    return 1;
+  }
+
   function filtrados() {
     const estadoFiltro = container.querySelector('#rep-filtro-estado').value;
     const q = container.querySelector('#rep-busqueda').value.toLowerCase().trim();
-    return todos.filter((t) => {
-      const cumpleEstado = estadoFiltro === 'TALLER' ? t.estado !== 'ENTREGADO' : t.estado === estadoFiltro;
+    const filas = todos.filter((t) => {
+      // "TALLER" es la opción por defecto del legacy y, aunque su etiqueta dice
+      // "No Entregado", el filtro real de ReparacionesDashboard.html no excluye
+      // nada en ese caso — muestra todo. Se replica tal cual.
+      const cumpleEstado = estadoFiltro === 'TALLER' ? true : t.estado === estadoFiltro;
       const texto = `${t.codigo} ${t.cliente?.nombre || ''} ${t.equipo}`.toLowerCase();
       return cumpleEstado && (!q || texto.includes(q));
     });
+    filas.sort((a, b) => prioridadEstado(a.estado) - prioridadEstado(b.estado));
+    return filas;
   }
 
   function renderTabla() {

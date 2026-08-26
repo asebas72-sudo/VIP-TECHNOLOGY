@@ -35,10 +35,18 @@ Todo el stack corre en tiers gratuitos.
 
 ## Empaquetado como APK (Android)
 
-El mismo `frontend/` es una PWA instalable. Para un `.apk` real:
+El mismo `frontend/` es una PWA instalable. Dos caminos, no excluyentes:
 
-- **Rápido**: [pwabuilder.com](https://www.pwabuilder.com) → pegar la URL de GitHub Pages → genera un APK/AAB firmado.
-- **Con más control** (recomendado, dado el uso de cámara/firma): [Capacitor](https://capacitorjs.com) sobre `frontend/dist`.
+- **Rápido, sin instalar nada**: [pwabuilder.com](https://www.pwabuilder.com) → pegar la URL de GitHub Pages → genera un APK/AAB firmado (usa Chrome/TWA por debajo).
+- **Nativo de verdad, recomendado**: [Capacitor](https://capacitorjs.com), ya configurado en `frontend/android/`.
+
+`frontend/capacitor.config.json` apunta el WebView a la URL pública de GitHub Pages (`server.url`) en vez de empaquetar `dist/` dentro del APK — así **los cambios de contenido/lógica se ven solos** la próxima vez que se abre la app, sin recompilar. Solo hace falta un `.apk` nuevo cuando cambia algo del *shell nativo*: ícono, nombre, permisos, o un plugin nuevo (ej. notificaciones push).
+
+Para generar el `.apk`:
+1. Instalar [Android Studio](https://developer.android.com/studio) (gratis) — solo una vez.
+2. `cd frontend && npm install && npm run build && npx cap sync android`
+3. `npx cap open android` (abre el proyecto en Android Studio)
+4. Menú **Build → Generate Signed Bundle / APK** → APK → crear un keystore nuevo (guárdalo, lo necesitas para futuras actualizaciones firmadas con la misma identidad) → Release.
 
 No requiere Play Store para uso interno — el `.apk` se instala directo en los celulares de los técnicos.
 

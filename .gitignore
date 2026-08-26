@@ -13,6 +13,21 @@ frontend/node_modules/
 frontend/dist/
 frontend/dev-dist/
 
+# Capacitor / Android (proyecto nativo generado por `npx cap add android` —
+# se reconstruye con `npx cap sync` a partir de dist/, no hace falta versionarlo)
+frontend/android/app/build/
+frontend/android/app/release/
+frontend/android/app/debug/
+frontend/android/build/
+frontend/android/.gradle/
+frontend/android/.idea/
+frontend/android/local.properties
+frontend/android/*.iml
+frontend/android/app/src/main/assets/public/
+frontend/android/capacitor-cordova-android-plugins/build/
+*.keystore
+*.jks
+
 # Supabase CLI local
 supabase/.branches/
 supabase/.temp/

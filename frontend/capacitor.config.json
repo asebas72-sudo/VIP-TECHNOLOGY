@@ -1,0 +1,9 @@
+{
+  "appId": "com.viptechnology.app",
+  "appName": "VIP TECHNOLOGY",
+  "webDir": "dist",
+  "server": {
+    "url": "https://asebas72-sudo.github.io/VIP-TECHNOLOGY/",
+    "cleartext": false
+  }
+}

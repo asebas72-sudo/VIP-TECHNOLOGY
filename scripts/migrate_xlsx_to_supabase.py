@@ -51,6 +51,13 @@ def leer_hoja(wb, nombre):
 
 
 def solo_digitos(valor):
+    # openpyxl lee las celdas numéricas de Excel como float (ej. 3123623627.0).
+    # str() sobre ese float da "3123623627.0"; si solo quitamos los caracteres
+    # no numéricos (incluida la ",") queda "31236236270" -- el "0" del ".0"
+    # se pega al número real y lo corrompe (celular/cédula con un dígito de más).
+    # Por eso hay que convertir a int ANTES de convertir a texto.
+    if isinstance(valor, float) and valor.is_integer():
+        valor = int(valor)
     return re.sub(r"\D", "", str(valor or ""))
 
 
@@ -98,7 +105,14 @@ def migrar_usuarios(filas):
         existentes = get("perfiles", {"usuario": f"eq.{usuario}", "select": "id"})
         if existentes:
             auth_id = existentes[0]["id"]
-            print(f"  = {usuario} ya existe, se omite creación en Auth")
+            # No se toca Auth (ya existe la cuenta), pero sí se refresca el perfil
+            # -- es lo que corrige el celular ya migrado con el bug del "0" pegado.
+            upsert(
+                "perfiles",
+                [{"id": auth_id, "usuario": usuario, "nombre": nombre, "rol": rol, "celular": celular}],
+                on_conflict="id",
+            )
+            print(f"  = {usuario} ya existe, perfil actualizado (celular incluido)")
         else:
             resp = requests.post(
                 f"{AUTH_ADMIN}/users",

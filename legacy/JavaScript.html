@@ -1,0 +1,127 @@
+<script>
+  var __menuHTML = null;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1. Guardar la plantilla del menú original
+    __menuHTML = document.getElementById('main-content').innerHTML;
+
+    // 2. Comprobar si existe una sesión activa
+    var session = sessionStorage.getItem('vip_user');
+    var token   = sessionStorage.getItem('vip_token');
+    var loginModal = document.getElementById('login-modal');
+
+    if (session && token) {
+      if (loginModal) loginModal.style.display = 'none';
+    } else {
+      if (loginModal) loginModal.style.display = 'flex';
+    }
+  });
+
+  /* =========================================================
+   *  LOGICA DE AUTENTICACION
+   * ========================================================= */
+  function handleLogin(e) {
+    e.preventDefault();
+
+    var userInput = document.getElementById('login-user');
+    var passInput = document.getElementById('login-pass');
+    var btn = document.getElementById('btn-login');
+    var errorDiv = document.getElementById('login-error');
+
+    var usuario = userInput ? userInput.value : '';
+    var clave = passInput ? passInput.value : '';
+
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = 'Verificando…';
+    }
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Ingresar';
+        }
+
+        if (res && res.success) {
+          // Guardar sesión en el navegador (caduca al cerrar pestaña)
+          sessionStorage.setItem('vip_user', JSON.stringify(res.user));
+          sessionStorage.setItem('vip_token', res.token);
+
+          // Limpiar el formulario
+          if (userInput) userInput.value = '';
+          if (passInput) passInput.value = '';
+
+          // Ocultar modal
+          var loginModal = document.getElementById('login-modal');
+          if (loginModal) loginModal.style.display = 'none';
+        } else {
+          if (errorDiv) {
+            errorDiv.innerText = res.message || 'Credenciales incorrectas.';
+            errorDiv.style.display = 'block';
+          }
+        }
+      })
+      .withFailureHandler(function (err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Ingresar';
+        }
+        if (errorDiv) {
+          errorDiv.innerText = 'Error del servidor: ' + (err && err.message ? err.message : err);
+          errorDiv.style.display = 'block';
+        }
+      })
+      .loginUser(usuario, clave);
+  }
+
+  function logoutUser() {
+    sessionStorage.removeItem('vip_user');
+    sessionStorage.removeItem('vip_token');
+
+    // Volver siempre al menú principal (pantalla de inicio)
+    var content = document.getElementById('main-content');
+    if (content && __menuHTML) {
+      content.innerHTML = __menuHTML;
+    }
+
+    var loginModal = document.getElementById('login-modal');
+    if (loginModal) loginModal.style.display = 'flex';
+  }
+
+  /* =========================================================
+   *  ENRUTAMIENTO Y NAVEGACION (SPA)
+   * ========================================================= */
+  function loadPage(page) {
+    var content = document.getElementById('main-content');
+    if (page === 'menu') {
+      content.innerHTML = __menuHTML;
+      return;
+    }
+    content.innerHTML = '<div class="loading"><span class="spinner"></span><p>Cargando…</p></div>';
+    google.script.run
+      .withSuccessHandler(function (html) {
+        content.innerHTML = html;
+        runInlineScripts_(content);
+      })
+      .withFailureHandler(function (err) {
+        content.innerHTML = '<div class="form-alert error">No se pudo cargar la página: ' + (err && err.message ? err.message : err) + '</div>';
+      })
+      .getPageContent(page);
+  }
+
+  // Los <script> insertados vía innerHTML no se ejecutan solos: hay que recrearlos
+  function runInlineScripts_(container) {
+    var scripts = container.querySelectorAll('script');
+    scripts.forEach(function (oldScript) {
+      var newScript = document.createElement('script');
+      if (oldScript.src) {
+        newScript.src = oldScript.src;
+      } else {
+        newScript.textContent = oldScript.textContent;
+      }
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }
+</script>

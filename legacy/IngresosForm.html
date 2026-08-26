@@ -1,0 +1,385 @@
+<div class="page-header">
+  <button class="btn btn-ghost" onclick="loadPage('menu')">← Menú</button>
+  <h2>Registrar ingreso de equipo</h2>
+</div>
+
+<div id="ingresoWrap">
+  <div id="ingresoAlert"></div>
+
+  <div class="form-layout">
+    <form class="form-card" id="ingresoForm">
+
+      <div class="field-group">
+        <label for="cedula">Cédula</label>
+        <input type="tel" id="cedula" inputmode="numeric" placeholder="Escribe la cédula para buscar cliente…" autocomplete="off">
+        <span id="cedulaHint" style="font-size:12px; color:#64748b; margin-top:4px; display:none;">🔍 Buscando cliente…</span>
+      </div>
+
+      <div class="field-group">
+        <label for="nombre">Nombre del cliente</label>
+        <input type="text" id="nombre" placeholder="Ej: Laura Gómez" autocomplete="off">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="celular">Celular</label>
+          <input type="tel" id="celular" inputmode="numeric" placeholder="Solo números" autocomplete="off">
+        </div>
+        <div class="field-group">
+          <label for="emailUser">Correo del cliente</label>
+          <input type="email" id="emailUser" placeholder="correo@ejemplo.com" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="equipo">Equipo</label>
+        <input type="text" id="equipo" placeholder="Ej: HP Pavilion 14" autocomplete="off">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="tipo">Tipo de equipo</label>
+          <select id="tipo">
+            <option value="">Selecciona…</option>
+            <option value="Escritorio">Escritorio</option>
+            <option value="Portátil">Portátil</option>
+            <option value="Todo en uno">Todo en uno</option>
+            <option value="Todo en uno">Impresora</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="marca">Marca</label>
+          <select id="marca">
+            <option value="">Cargando marcas…</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Accesorios que entrega el cliente</label>
+        <div class="chip-group">
+          <label class="chip"><input type="checkbox" class="accesorio-check" value="Cargador"> Cargador</label>
+          <label class="chip"><input type="checkbox" class="accesorio-check" value="Teclado"> Teclado</label>
+          <label class="chip"><input type="checkbox" class="accesorio-check" value="Mouse"> Mouse</label>
+          <label class="chip"><input type="checkbox" class="accesorio-check" value="Estuche"> Estuche</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="fallas">Fallas reportadas</label>
+        <textarea id="fallas" placeholder="¿Qué problema presenta el equipo?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="observaciones">Observaciones</label>
+        <textarea id="observaciones" placeholder="Estado físico, detalles adicionales…"></textarea>
+      </div>
+
+      <p class="section-label">Foto del equipo</p>
+      <div class="field-group">
+        <div class="photo-drop">
+          <input type="file" id="fotoInput" accept="image/*" capture="environment">
+          <p class="field-hint">Toma una foto o sube una imagen del equipo.</p>
+          <img id="fotoPreview" class="photo-preview" alt="Foto del equipo">
+        </div>
+      </div>
+
+      <p class="section-label">Firma del cliente</p>
+      <div class="field-group">
+        <div class="signature-wrap">
+          <canvas id="firmaCanvas"></canvas>
+          <div class="signature-actions">
+            <button type="button" class="btn btn-secondary" id="btnLimpiarFirma">Borrar firma</button>
+          </div>
+        </div>
+        <p class="field-hint">El cliente firma aquí con el dedo, mouse o lápiz óptico.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="btnGuardar" style="width:100%; margin-top:6px;">
+        Guardar ingreso
+      </button>
+    </form>
+
+    <aside class="ticket" id="ticketPreview">
+      <span class="ticket-eyebrow">Vista previa</span>
+      <div class="ticket-row"><span>Cliente</span><span id="pvCliente">—</span></div>
+      <div class="ticket-row"><span>Equipo</span><span id="pvEquipo">—</span></div>
+      <div class="ticket-row"><span>Marca</span><span id="pvMarca">—</span></div>
+      <div class="ticket-row"><span>Entrega estimada</span><span id="pvEntrega">—</span></div>
+      <div class="ticket-codigo" id="pvCodigo">Se genera al guardar</div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  var marcas       = [];
+  var fotoBase64   = '';
+  var hasSignature = false;
+  var ultimoCelular = '';
+
+  var WHATSAPP_MENSAJE_TEMPLATE =
+    'Hola {nombre} \u{1F44B}\n' +
+    'Tu equipo *{equipo}* fue registrado en *VIP TECHNOLOGY*.\n\n' +
+    '\u{1F9FE} Código de Caso: *{codigo}*\n' +
+    '\u{1F4C5} Fecha de ingreso: {fechaIngreso}\n\n' +
+    'Pronto uno de nuestros tecnicos se comunicara contigo.\n\n' +
+    'Guarda este código, lo necesitarás para reclamar tu equipo.\n' +
+    '¡Gracias por confiar en nosotros!';
+
+  function construirMensajeWhatsapp(res) {
+    return WHATSAPP_MENSAJE_TEMPLATE
+      .replace(/{nombre}/g,       res.nombre       || '')
+      .replace(/{equipo}/g,       res.equipo       || '')
+      .replace(/{codigo}/g,       res.codigo       || '')
+      .replace(/{fechaIngreso}/g, res.fechaIngreso || '');
+  }
+
+  function waLink(celular, texto) {
+    var digits = String(celular || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length === 10) digits = '57' + digits;
+    return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(texto);
+  }
+
+  /* ---------- Vista previa de entrega ---------- */
+  function fechaEntregaEstimada() {
+    var d = new Date();
+    d.setDate(d.getDate() + 8);
+    var dd = String(d.getDate()).padStart(2, '0');
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    return dd + '/' + mm + '/' + d.getFullYear();
+  }
+  document.getElementById('pvEntrega').textContent = fechaEntregaEstimada();
+
+  function actualizarPreview() {
+    document.getElementById('pvCliente').textContent = document.getElementById('nombre').value || '—';
+    document.getElementById('pvEquipo').textContent  = document.getElementById('equipo').value || '—';
+    document.getElementById('pvMarca').textContent   = document.getElementById('marca').value  || '—';
+  }
+  ['nombre', 'equipo'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', actualizarPreview);
+  });
+
+  /* ---------- Autocompletado por cédula ---------- */
+  var cedulaInput = document.getElementById('cedula');
+  var cedulaHint  = document.getElementById('cedulaHint');
+
+  cedulaInput.addEventListener('blur', function () {
+    var ced = this.value.replace(/\D/g, '').trim();
+    if (ced.length < 4) return;
+
+    cedulaHint.style.display = 'block';
+    cedulaHint.textContent   = '🔍 Buscando cliente…';
+
+    google.script.run
+      .withSuccessHandler(function (cliente) {
+        cedulaHint.style.display = 'none';
+        if (!cliente) return;
+
+        var campoNombre  = document.getElementById('nombre');
+        var campoCelular = document.getElementById('celular');
+        var campoEmail   = document.getElementById('emailUser');
+
+        if (cliente.nombre  && !campoNombre.value.trim())  campoNombre.value  = cliente.nombre;
+        if (cliente.celular && !campoCelular.value.trim()) campoCelular.value = cliente.celular;
+        if (cliente.correo  && !campoEmail.value.trim())   campoEmail.value   = cliente.correo;
+
+        actualizarPreview();
+
+        cedulaHint.style.display = 'block';
+        cedulaHint.style.color   = '#16a34a';
+        cedulaHint.textContent   = '✅ Cliente encontrado: ' + (cliente.nombre || '');
+        setTimeout(function () {
+          cedulaHint.style.display = 'none';
+          cedulaHint.style.color   = '#64748b';
+        }, 3000);
+      })
+      .withFailureHandler(function () {
+        cedulaHint.style.display = 'none';
+      })
+      .buscarClientePorCedula(ced);
+  });
+
+  /* ---------- Marcas ---------- */
+  var marcaSelect = document.getElementById('marca');
+
+  google.script.run.withSuccessHandler(function (lista) {
+    marcas = lista || [];
+    marcaSelect.innerHTML = '<option value="">Selecciona…</option>';
+    marcas.forEach(function (m) {
+      var opt = document.createElement('option');
+      opt.value       = m.nombre;
+      opt.textContent = m.nombre;
+      marcaSelect.appendChild(opt);
+    });
+  }).withFailureHandler(function () {
+    marcaSelect.innerHTML = '<option value="">No se pudieron cargar las marcas</option>';
+  }).getMarcas();
+
+  marcaSelect.addEventListener('change', function () { actualizarPreview(); });
+
+  /* ---------- Foto ---------- */
+  document.getElementById('fotoInput').addEventListener('change', function (evt) {
+    var file = evt.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      fotoBase64 = e.target.result;
+      var img = document.getElementById('fotoPreview');
+      img.src           = fotoBase64;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ---------- Firma (canvas) ---------- */
+  var canvas  = document.getElementById('firmaCanvas');
+  var ctx     = canvas.getContext('2d');
+  var drawing = false;
+
+  function prepararCanvas() {
+    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+    var rect  = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.fillStyle   = '#ffffff';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.lineWidth   = 2.2;
+    ctx.lineCap     = 'round';
+    ctx.strokeStyle = '#16202B';
+  }
+  prepararCanvas();
+  window.addEventListener('resize', function () { prepararCanvas(); hasSignature = false; });
+
+  function posicion(evt) {
+    var rect = canvas.getBoundingClientRect();
+    var x = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    var y = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    return { x: x - rect.left, y: y - rect.top };
+  }
+  function iniciarTrazo(evt)   { drawing = true; hasSignature = true; var p = posicion(evt); ctx.beginPath(); ctx.moveTo(p.x, p.y); evt.preventDefault(); }
+  function continuarTrazo(evt) { if (!drawing) return; var p = posicion(evt); ctx.lineTo(p.x, p.y); ctx.stroke(); evt.preventDefault(); }
+  function terminarTrazo()     { drawing = false; }
+
+  canvas.addEventListener('mousedown',  iniciarTrazo);
+  canvas.addEventListener('mousemove',  continuarTrazo);
+  canvas.addEventListener('mouseup',    terminarTrazo);
+  canvas.addEventListener('mouseleave', terminarTrazo);
+  canvas.addEventListener('touchstart', iniciarTrazo,   { passive: false });
+  canvas.addEventListener('touchmove',  continuarTrazo, { passive: false });
+  canvas.addEventListener('touchend',   terminarTrazo);
+
+  document.getElementById('btnLimpiarFirma').addEventListener('click', function () {
+    var rect = canvas.getBoundingClientRect();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    hasSignature = false;
+  });
+
+  /* ---------- Alertas ---------- */
+  function mostrarErrores(lista) {
+    var html = '<div class="form-alert error"><strong>Revisa lo siguiente:</strong><ul>';
+    lista.forEach(function (e) { html += '<li>' + e + '</li>'; });
+    html += '</ul></div>';
+    document.getElementById('ingresoAlert').innerHTML = html;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function limpiarAlertas() { document.getElementById('ingresoAlert').innerHTML = ''; }
+
+  /* ---------- Envío ---------- */
+  document.getElementById('ingresoForm').addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    limpiarAlertas();
+
+    var nombre        = document.getElementById('nombre').value.trim();
+    var cedula        = document.getElementById('cedula').value.replace(/\D/g, '').trim();
+    var celular       = document.getElementById('celular').value.replace(/\D/g, '').trim();
+    var equipo        = document.getElementById('equipo').value.trim();
+    var tipo          = document.getElementById('tipo').value;
+    var marca         = document.getElementById('marca').value;
+    var fallas        = document.getElementById('fallas').value.trim();
+    var observaciones = document.getElementById('observaciones').value.trim();
+    var emailUser     = document.getElementById('emailUser').value.trim();
+    var accesorios    = Array.prototype.slice.call(
+      document.querySelectorAll('.accesorio-check:checked')
+    ).map(function (c) { return c.value; });
+
+    var errores = [];
+    if (!nombre)       errores.push('El nombre es obligatorio.');
+    if (!cedula)       errores.push('La cédula debe contener solo números.');
+    if (!celular)      errores.push('El celular debe contener solo números.');
+    if (!equipo)       errores.push('Describe el equipo.');
+    if (!tipo)         errores.push('Selecciona el tipo de equipo.');
+    if (!marca)        errores.push('Selecciona la marca.');
+    if (!hasSignature) errores.push('Falta la firma del cliente.');
+
+    if (errores.length) { mostrarErrores(errores); return; }
+
+    ultimoCelular = celular;
+
+    var btn = document.getElementById('btnGuardar');
+    btn.disabled    = true;
+    btn.textContent = 'Guardando…';
+
+    var payload = {
+      nombre: nombre, cedula: cedula, celular: celular,
+      equipo: equipo, tipo: tipo,    marca: marca,
+      accesorios: accesorios, fallas: fallas,
+      observaciones: observaciones,  emailUser: emailUser,
+      firma : canvas.toDataURL('image/png'),
+      imagen: fotoBase64 || ''
+    };
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar ingreso';
+        if (!res.ok) { mostrarErrores([res.error]); return; }
+        renderConfirmacion(res);
+      })
+      .withFailureHandler(function (err) {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar ingreso';
+        mostrarErrores([err && err.message ? err.message : 'Error inesperado al guardar.']);
+      })
+      .saveIngreso(payload);
+  });
+
+  /* ---------- Pantalla de confirmación ---------- */
+  function renderConfirmacion(res) {
+    var mensajeInicial = construirMensajeWhatsapp(res);
+
+    document.getElementById('ingresoWrap').innerHTML =
+      '<div class="form-card confirm-wrap">' +
+        '<div class="confirm-icon">✓</div>' +
+        '<h2>Equipo registrado</h2>' +
+        '<p class="field-hint">Entrega este código al cliente, lo necesitará para reclamar el equipo.</p>' +
+        '<div class="ticket-codigo" style="background:var(--color-accent-soft); color:var(--color-accent-dark); max-width:320px; margin:16px auto;">' + res.codigo + '</div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Cliente</span><span>'           + res.nombre      + '</span></div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Equipo</span><span>'            + res.equipo      + '</span></div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Fecha de ingreso</span><span>'  + res.fechaIngreso + '</span></div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Fecha de entrega</span><span>'  + res.fechaEntrega + '</span></div>' +
+
+        '<div class="field-group" style="max-width:320px; margin:18px auto 0;">' +
+          '<label for="mensajeWhatsapp" style="text-align:left;">Mensaje para el cliente (editable)</label>' +
+          '<textarea id="mensajeWhatsapp" style="min-height:130px;">' + mensajeInicial + '</textarea>' +
+        '</div>' +
+
+        '<div class="confirm-actions">' +
+          '<button class="btn btn-primary" style="background:#25D366; border-color:#25D366;" id="btnEnviarWhatsapp" type="button">\u{1F4F2} Enviar por WhatsApp</button>' +
+          '<button class="btn btn-primary" onclick="loadPage(\'ingresoForm\')">Registrar otro equipo</button>' +
+          '<button class="btn btn-secondary" onclick="loadPage(\'menu\')">Volver al menú</button>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('btnEnviarWhatsapp').addEventListener('click', function () {
+      var texto = document.getElementById('mensajeWhatsapp').value.trim();
+      var link  = waLink(ultimoCelular, texto);
+      if (!link) { alert('No hay un celular válido registrado para enviar el WhatsApp.'); return; }
+      window.open(link, '_blank');
+    });
+  }
+})();
+</script>

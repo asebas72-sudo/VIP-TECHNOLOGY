@@ -1,0 +1,1108 @@
+<style>
+  .app-shell {
+    max-width: 100% !important;
+    padding: 20px 24px 60px !important;
+  }
+
+  #aseWrap {
+    --sys-white: #ffffff !important;
+    --sys-gray-50: #f8fafc !important;
+    --sys-gray-100: #f1f5f9 !important;
+    --sys-gray-200: #e2e8f0 !important;
+    --sys-gray-300: #cbd5e1 !important;
+    --sys-gray-700: #475569 !important;
+    --sys-gray-900: #0f172a !important;
+    --sys-blue-600: #2563eb !important;
+    --sys-blue-700: #1d4ed8 !important;
+    --sys-green-600: #16a34a !important;
+    --sys-green-700: #15803d !important;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100% !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    color: var(--sys-gray-900) !important;
+    box-sizing: border-box;
+  }
+  #aseWrap *, #aseWrap *::before, #aseWrap *::after { box-sizing: border-box; }
+
+  /* ── ENCABEZADO ── */
+  .sys-header-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0 5px 0 !important;
+    border-bottom: 1px solid var(--sys-gray-200) !important;
+    margin-bottom: 10px;
+  }
+  .sys-header-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: var(--sys-gray-900) !important;
+    color: var(--sys-white) !important;
+    border-radius: 8px !important;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.15) !important;
+  }
+  .sys-header-text h1 {
+    font-size: 24px !important; font-weight: 700 !important;
+    letter-spacing: -0.02em !important; margin: 0 !important;
+    color: var(--sys-gray-900) !important;
+  }
+  .sys-header-text p {
+    font-size: 13px !important; color: var(--sys-gray-700) !important; margin: 2px 0 0 0 !important;
+  }
+
+  /* ── KPI ── */
+  .kpi-banner {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px; width: 100% !important;
+  }
+  @media (max-width: 768px) { .kpi-banner { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-card {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-200) !important;
+    border-radius: 8px !important; padding: 16px !important;
+    display: flex; flex-direction: column; gap: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    min-width: 0;
+  }
+  .kpi-label { font-size: 11px !important; font-weight: 600 !important; text-transform: uppercase !important; color: var(--sys-gray-700) !important; letter-spacing: 0.05em !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-value { font-size: 28px !important; font-weight: 700 !important; line-height: 1 !important; color: var(--sys-gray-900) !important; }
+  .kpi-card.kpi-total      { border-left: 4px solid var(--sys-gray-700) !important; }
+  .kpi-card.kpi-pendiente  { border-left: 4px solid #3b82f6 !important; }
+  .kpi-card.kpi-confirmada { border-left: 4px solid #f59e0b !important; }
+  .kpi-card.kpi-realizada  { border-left: 4px solid #10b981 !important; }
+  .kpi-card.kpi-cancelada  { border-left: 4px solid #ef4444 !important; }
+
+  /* ── BARRA DE CONTROLES ── */
+  .control-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-200) !important;
+    border-radius: 8px !important; padding: 10px 14px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    width: 100% !important; box-sizing: border-box;
+  }
+  .controls-left-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1 1 320px; min-width: 0; }
+  .sys-input-search {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 6px !important; padding: 0 12px !important;
+    height: 36px !important; font-size: 13px !important;
+    color: var(--sys-gray-900) !important; width: 220px !important; outline: none !important;
+    flex: 1 1 180px; min-width: 140px;
+  }
+  .sys-select {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 6px !important; padding: 0 10px !important;
+    height: 36px !important; font-size: 13px !important;
+    color: var(--sys-gray-900) !important; outline: none !important; cursor: pointer !important;
+    flex: 1 1 160px; min-width: 140px;
+  }
+  .sys-input-search:focus, .sys-select:focus, .sys-input-date:focus {
+    border-color: var(--sys-blue-600) !important;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.1) !important;
+  }
+  .date-range-inline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-left: 1px solid var(--sys-gray-200); padding-left: 10px; }
+  .date-filter-label { font-size: 12px !important; font-weight: 500 !important; color: var(--sys-gray-700) !important; white-space: nowrap; }
+  .sys-input-date {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 6px !important; padding: 0 8px !important;
+    height: 36px !important; font-size: 12px !important;
+    color: var(--sys-gray-900) !important; outline: none !important;
+    width: 125px !important; font-family: inherit; box-sizing: border-box;
+    flex: 1 1 110px; min-width: 105px;
+  }
+  .controls-right-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sys-btn {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; height: 36px !important; padding: 0 14px !important; border-radius: 6px !important;
+    font-size: 13px !important; font-weight: 600 !important; border: 1px solid var(--sys-gray-300) !important;
+    background: var(--sys-white) !important; color: var(--sys-gray-700) !important; cursor: pointer !important;
+    transition: all 0.15s ease !important; white-space: nowrap;
+  }
+  .sys-btn:hover { background: var(--sys-gray-50) !important; border-color: var(--sys-gray-700) !important; }
+  .sys-btn-primary { background: var(--sys-blue-600) !important; color: var(--sys-white) !important; border: none !important; }
+  .sys-btn-primary:hover { background: var(--sys-blue-700) !important; }
+
+  /* ── TABLA ── */
+  .matrix-container {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 8px !important; overflow-x: hidden !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; width: 100% !important;
+  }
+  .matrix-table {
+    width: 100% !important; border-collapse: collapse !important;
+    font-size: 13px !important; text-align: left !important;
+    background: var(--sys-white) !important;
+    table-layout: fixed !important;
+  }
+  .matrix-table th {
+    background: var(--sys-gray-50) !important; padding: 12px 10px !important;
+    font-weight: 600 !important; font-size: 11px !important;
+    text-transform: uppercase !important; color: var(--sys-gray-700) !important;
+    border-bottom: 2px solid var(--sys-gray-300) !important;
+    border-right: 1px solid var(--sys-gray-200) !important;
+    letter-spacing: 0.03em !important; white-space: nowrap !important;
+  }
+  .matrix-table th:last-child { border-right: none !important; }
+  .matrix-table td {
+    padding: 11px 10px !important; background: var(--sys-white) !important;
+    border-bottom: 1px solid var(--sys-gray-200) !important;
+    border-right: 1px solid var(--sys-gray-200) !important;
+    color: var(--sys-gray-900) !important; white-space: nowrap !important;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .matrix-table td:last-child { border-right: none !important; }
+  .matrix-table tbody tr:hover td { background: var(--sys-gray-50) !important; cursor: pointer; }
+
+  .matrix-table td.wrap-text, .matrix-table th.wrap-text {
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: 130px !important;
+  }
+
+  .wa-icon-link {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 28px !important; height: 28px !important; transition: transform 0.12s ease !important;
+  }
+  .wa-icon-link:hover { transform: scale(1.15) !important; }
+  button.wa-icon-link {
+    border: none !important; background: none !important; padding: 0 !important; cursor: pointer !important;
+    flex-shrink: 0;
+  }
+
+  .status-pill { display: inline-flex !important; align-items: center !important; font-size: 11px !important; font-weight: 700 !important; padding: 2px 8px !important; border-radius: 4px !important; text-transform: uppercase !important; }
+  .st-pendiente  { background: #e0f2fe !important; color: #0369a1 !important; }
+  .st-confirmada { background: #fef3c7 !important; color: #b45309 !important; }
+  .st-realizada  { background: #d1fae5 !important; color: #047857 !important; }
+  .st-cancelada  { background: #fee2e2 !important; color: #b91c1c !important; }
+
+  .costo-valor { font-family: 'IBM Plex Mono', monospace !important; font-size: 12px !important; font-weight: 600 !important; color: #047857 !important; }
+
+  .tecnico-pill {
+    display: inline-flex !important; align-items: center !important;
+    font-size: 11px !important; font-weight: 600 !important;
+    color: var(--sys-gray-700) !important;
+  }
+  .tecnico-sin-asignar { color: var(--sys-gray-300) !important; font-style: italic; }
+
+  .matrix-footer {
+    display: flex !important; align-items: center !important; justify-content: space-between !important;
+    flex-wrap: wrap; gap: 8px;
+    padding: 12px 14px !important; font-size: 12px !important; color: var(--sys-gray-700) !important;
+    background: var(--sys-gray-50) !important; border-top: 1px solid var(--sys-gray-300) !important;
+  }
+
+  /* ── MODAL ── */
+  .sys-modal-overlay {
+    position: fixed !important; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15,23,42,0.6) !important; backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 9999 !important; padding: 12px;
+  }
+  .sys-modal-card {
+    background: #ffffff !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 10px !important; width: 100%; max-width: 520px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25) !important;
+    display: flex; flex-direction: column; overflow: hidden;
+    animation: modalShow 0.18s ease-out;
+    max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes modalShow { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .sys-modal-header {
+    background: var(--sys-gray-50) !important;
+    padding: 10px 16px !important; border-bottom: 1px solid var(--sys-gray-200) !important;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 2;
+  }
+  .sys-modal-title { font-size: 14px !important; font-weight: 700 !important; color: var(--sys-gray-900) !important; }
+  .sys-modal-close { font-size: 18px; color: var(--sys-gray-700); cursor: pointer; background: none; border: none; padding: 2px; }
+  .sys-modal-close:hover { color: var(--sys-gray-900); }
+
+  .sys-modal-body { padding: 14px 16px !important; display: flex; flex-direction: column; gap: 8px; background: #ffffff !important; }
+  .modal-grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-data-group { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .modal-data-label { font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; color: var(--sys-gray-700) !important; letter-spacing: 0.03em; }
+  .modal-data-value {
+    font-size: 12px !important; background: var(--sys-gray-50) !important;
+    padding: 5px 8px !important; border-radius: 4px !important;
+    border: 1px solid var(--sys-gray-200) !important; color: var(--sys-gray-900) !important;
+    overflow-wrap: break-word;
+  }
+  .modal-input, .modal-select, .modal-textarea {
+    font-size: 12px !important; padding: 6px 8px !important; border-radius: 4px !important;
+    border: 1px solid var(--sys-gray-300) !important; color: var(--sys-gray-900) !important;
+    font-family: inherit; width: 100%; box-sizing: border-box; outline: none !important;
+  }
+  .modal-textarea { min-height: 55px; resize: vertical; }
+
+  .modal-input:disabled, .modal-select:disabled, .modal-textarea:disabled {
+    background: var(--sys-gray-100) !important;
+    color: var(--sys-gray-700) !important;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+  }
+
+  .tecnico-input-row { display: flex; align-items: center; gap: 8px; }
+  .tecnico-input-row .modal-input { flex: 1 1 auto; min-width: 0; }
+  .tecnico-sin-celular-msg {
+    display: none; font-size: 10px !important; color: #b91c1c !important; margin-top: 2px !important;
+  }
+
+  /* Botones modal */
+  .modal-actions-container {
+    display: flex; flex-direction: column; gap: 6px;
+    border-top: 1px solid var(--sys-gray-200); padding-top: 10px; margin-top: 4px;
+  }
+  .sys-btn-entregar {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; height: 34px !important; padding: 0 14px !important; border-radius: 6px !important;
+    font-size: 12px !important; font-weight: 700 !important; border: none !important;
+    background: var(--sys-green-600) !important; color: #ffffff !important; cursor: pointer !important;
+    transition: background 0.15s ease !important; width: 100%;
+  }
+  .sys-btn-entregar:hover { background: var(--sys-green-700) !important; }
+  .sys-btn-entregar:disabled { background: var(--sys-gray-300) !important; color: var(--sys-gray-700) !important; cursor: not-allowed !important; }
+
+  .sys-btn-guardar {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; height: 34px !important; padding: 0 14px !important; border-radius: 6px !important;
+    font-size: 12px !important; font-weight: 700 !important; border: none !important;
+    background: var(--sys-blue-600) !important; color: #ffffff !important; cursor: pointer !important;
+    transition: background 0.15s ease !important; width: 100%;
+  }
+  .sys-btn-guardar:hover { background: var(--sys-blue-700) !important; }
+  .sys-btn-guardar:disabled { background: var(--sys-gray-300) !important; color: var(--sys-gray-700) !important; cursor: not-allowed !important; }
+
+  .sys-btn-wa-notify {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; height: 34px !important; padding: 0 14px !important; border-radius: 6px !important;
+    font-size: 12px !important; font-weight: 700 !important; border: none !important;
+    background: #25D366 !important; color: #ffffff !important; cursor: pointer !important;
+    transition: opacity 0.15s ease !important; width: 100%; text-decoration: none;
+  }
+  .sys-btn-wa-notify:hover { opacity: 0.9; }
+
+  /* Toast */
+  #aseToastMsg {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #0f172a; color: #fff; padding: 10px 22px;
+    border-radius: 8px; font-size: 13px; font-weight: 600;
+    z-index: 99999; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    max-width: 90vw; text-align: center;
+  }
+  #aseToastMsg.show { opacity: 1; }
+
+  /* ══════════════ RESPONSIVE ══════════════ */
+  @media (max-width: 768px) {
+    .app-shell { padding: 14px 12px 40px !important; }
+    .sys-header-icon { width: 38px; height: 38px; font-size: 18px; }
+    .sys-header-text h1 { font-size: 19px !important; }
+    .kpi-card { padding: 12px !important; }
+    .kpi-value { font-size: 22px !important; }
+
+    .control-bar { padding: 10px !important; }
+    .controls-left-group { flex: 1 1 100% !important; width: 100% !important; }
+    .sys-input-search { width: 100% !important; flex: 1 1 100% !important; }
+    .sys-select { width: 100% !important; flex: 1 1 100% !important; }
+    .date-range-inline { border-left: none !important; padding-left: 0 !important; width: 100% !important; }
+    .controls-right-group { width: 100% !important; }
+    .controls-right-group .sys-btn { flex: 1 1 auto !important; }
+
+    /* Tabla → tarjetas apiladas (nada de columnas apretadas en celular) */
+    .matrix-container { overflow-x: visible !important; padding: 10px !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+    .matrix-table { min-width: 0 !important; table-layout: auto !important; border-collapse: separate !important; border-spacing: 0 10px !important; }
+    .matrix-table thead { display: none !important; }
+    .matrix-table tbody, .matrix-table tr, .matrix-table td { display: block !important; width: 100% !important; }
+    .matrix-table tr {
+      background: var(--sys-white) !important;
+      border: 1px solid var(--sys-gray-200) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+      overflow: hidden;
+    }
+    .matrix-table tbody tr:hover td { background: var(--sys-white) !important; }
+    .matrix-table td {
+      border: none !important;
+      border-bottom: 1px solid var(--sys-gray-100) !important;
+      padding: 9px 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 12px;
+      text-align: right !important;
+      white-space: normal !important;
+      overflow: visible !important;
+      max-width: none !important;
+    }
+    .matrix-table td.wrap-text { max-width: none !important; }
+    .matrix-table td:last-child { border-bottom: none !important; }
+    .matrix-table td::before {
+      content: attr(data-label);
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.03em;
+      color: var(--sys-gray-700) !important;
+      flex-shrink: 0;
+      text-align: left !important;
+    }
+    .matrix-table td.td-wa-cell {
+      justify-content: flex-end !important;
+      background: var(--sys-gray-50) !important;
+    }
+    .matrix-table td.td-wa-cell::before { content: none !important; }
+
+    .matrix-footer { justify-content: center !important; text-align: center !important; }
+
+    /* Modal */
+    .sys-modal-overlay { padding: 6px !important; }
+    .sys-modal-card { max-height: 94vh !important; }
+    .modal-grid-row { grid-template-columns: 1fr !important; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-banner { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    .kpi-label { font-size: 10px !important; }
+    .kpi-value { font-size: 19px !important; }
+    .sys-input-date { min-width: 100px; }
+  }
+</style>
+
+<div id="aseWrap">
+
+  <div class="sys-header-container">
+    <div class="sys-header-icon">🗓️</div>
+    <div class="sys-header-text">
+      <h1>Control de Asesorías</h1>
+    </div>
+  </div>
+
+  <div class="kpi-banner">
+    <div class="kpi-card kpi-total">
+      <span class="kpi-label">Total Solicitudes</span>
+      <span class="kpi-value" id="aseTotal">—</span>
+    </div>
+    <div class="kpi-card kpi-pendiente">
+      <span class="kpi-label">Pendientes</span>
+      <span class="kpi-value" id="asePendientes">—</span>
+    </div>
+    <div class="kpi-card kpi-confirmada">
+      <span class="kpi-label">Confirmadas</span>
+      <span class="kpi-value" id="aseConfirmadas">—</span>
+    </div>
+    <div class="kpi-card kpi-realizada">
+      <span class="kpi-label">Realizadas</span>
+      <span class="kpi-value" id="aseRealizadas">—</span>
+    </div>
+    <div class="kpi-card kpi-cancelada">
+      <span class="kpi-label">Canceladas</span>
+      <span class="kpi-value" id="aseCanceladas">—</span>
+    </div>
+  </div>
+
+  <div class="control-bar">
+    <div class="controls-left-group">
+      <input type="text" id="aseSearchInput" class="sys-input-search" placeholder="Buscar por cliente, ID..." oninput="filtrarTodoAse()">
+      <select id="aseStatusFilter" class="sys-select" onchange="filtrarPorEstadoAse(this.value)">
+        <option value="TODOS">📋 Todos los Estados</option>
+        <option value="PENDIENTE">📥 Pendiente</option>
+        <option value="CONFIRMADA">🔧 Confirmada</option>
+        <option value="REALIZADA">✅ Realizada</option>
+        <option value="CANCELADA">🚫 Cancelada</option>
+      </select>
+      <div class="date-range-inline">
+        <span class="date-filter-label">Desde:</span>
+        <input type="date" id="aseDateFrom" class="sys-input-date" onchange="filtrarTodoAse()">
+        <span class="date-filter-label">Hasta:</span>
+        <input type="date" id="aseDateTo" class="sys-input-date" onchange="filtrarTodoAse()">
+      </div>
+    </div>
+    <div class="controls-right-group">
+      <button class="sys-btn sys-btn-primary" onclick="loadPage('asesoriaForm')">+ Nueva Asesoría</button>
+      <button class="sys-btn sys-btn-primary" onclick="loadPage('menu')">Menu</button>
+    </div>
+  </div>
+
+  <div id="aseTableWrap">
+    <div class="matrix-container">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th style="width: 38px; text-align: center; padding: 12px 8px !important;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block;margin:auto;opacity:0.5"><path d="M12.004 2C6.48 2 2 6.48 2 12c0 1.908.533 3.69 1.454 5.215L2 22l4.93-1.39A9.957 9.957 0 0 0 12.004 22c5.523 0 10-4.48 10-10s-4.477-10-10-10zm0 1.5c4.694 0 8.5 3.806 8.5 8.5s-3.806 8.5-8.5 8.5c-1.636 0-3.155-.465-4.453-1.266l-.32-.2-.228.064-2.73.768.784-2.646-.07-.246A8.448 8.448 0 0 1 3.5 12c0-4.694 3.806-8.5 8.5-8.5zm-3.565 4.316c-.168 0-.395.064-.567.246-.173.183-.664.648-.664 1.583 0 .935.683 1.838.777 1.966.095.127 1.315 2.1 3.25 2.87.46.184.82.293 1.1.382.463.14.884.12 1.217.07.37-.055 1.144-.467 1.304-.917.16-.45.16-.836.112-.917-.048-.08-.176-.127-.37-.225-.192-.097-1.143-.564-1.32-.628-.176-.065-.304-.097-.432.096-.128.193-.496.628-.608.756-.112.128-.224.145-.417.048a5.274 5.274 0 0 1-1.547-.954 5.82 5.82 0 0 1-1.07-1.332c-.113-.193-.012-.298.084-.394.086-.086.192-.225.289-.338.096-.113.128-.193.192-.322.064-.13.032-.24-.016-.338-.048-.096-.432-1.045-.592-1.432-.156-.376-.315-.325-.432-.33l-.369-.006z" fill="#25D366"/></svg>
+            </th>
+            <th style="cursor:pointer; width:100px;" onclick="sortByAse('FechaIngreso')">Fecha ↑↓</th>
+            <th class="wrap-text" style="width:70px;">ID</th>
+            <th style="cursor:pointer;" onclick="sortByAse('Nombre')">Cliente ↑↓</th>
+            <th style="width:110px;">Celular</th>
+            <th style="width:150px;">Solicitud</th>
+            <th style="width:120px;">Técnico</th>
+            <th style="width:130px;">Fecha Visita</th>
+            <th class="wrap-text">Detalle</th>
+            <th style="width:95px;">Costo</th>
+            <th style="cursor:pointer; width:120px;" onclick="sortByAse('Estado')">Estado ↑↓</th>
+          </tr>
+        </thead>
+        <tbody id="aseBodyTable">
+          <tr>
+            <td colspan="11" style="text-align:center; padding:40px; color:var(--sys-gray-700);">
+              Sincronizando registros con el repositorio principal...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="matrix-footer">
+        <span id="asePagInfo">Calculando registros...</span>
+        <div style="display:flex; gap:6px;">
+          <button class="sys-btn" id="aseBtnPrev" onclick="cambiarPagAse(-1)" style="height:30px; padding:0 10px;">← Ant</button>
+          <button class="sys-btn" id="aseBtnNext" onclick="cambiarPagAse(1)"  style="height:30px; padding:0 10px;">Sig →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="aseModal" class="sys-modal-overlay" onclick="cerrarModalAse()">
+    <div class="sys-modal-card" onclick="event.stopPropagation()">
+      <div class="sys-modal-header">
+        <span class="sys-modal-title" id="aseMdlTicketCode">Detalle de Asesoría</span>
+        <button class="sys-modal-close" onclick="cerrarModalAse()">✕</button>
+      </div>
+      <div class="sys-modal-body">
+
+        <div class="modal-grid-row">
+          <div class="modal-data-group">
+            <span class="modal-data-label">Fecha Solicitud</span>
+            <span class="modal-data-value" id="aseMdlFecha">—</span>
+          </div>
+          <div class="modal-data-group">
+            <span class="modal-data-label">📅 Fecha y Hora Visita</span>
+            <input type="datetime-local" class="modal-input" id="aseMdlFechaVisitaInput">
+          </div>
+        </div>
+
+        <div class="modal-data-group">
+          <span class="modal-data-label">Cliente</span>
+          <span class="modal-data-value" id="aseMdlCliente" style="font-weight:600;">—</span>
+        </div>
+
+        <div class="modal-grid-row">
+          <div class="modal-data-group">
+            <span class="modal-data-label">Celular</span>
+            <span class="modal-data-value" id="aseMdlCelular">—</span>
+          </div>
+          <div class="modal-data-group">
+            <span class="modal-data-label">Solicitud</span>
+            <span class="modal-data-value" id="aseMdlSolicitud">—</span>
+          </div>
+        </div>
+
+        <div class="modal-data-group">
+          <span class="modal-data-label">🧑‍🔧 Técnico Asignado</span>
+          <div class="tecnico-input-row">
+            <input type="text" class="modal-input" id="aseMdlTecnicoInput" placeholder="Escribe el nombre del técnico…" list="aseTecnicosSugeridos" autocomplete="off" oninput="actualizarBotonWaTecnicoAse()">
+            <button type="button" id="aseBtnWaTecnico" class="wa-icon-link" style="display:none;" title="Avisar al técnico por WhatsApp" onclick="notificarTecnicoAse()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12.004 2C6.48 2 2 6.48 2 12c0 1.908.533 3.69 1.454 5.215L2 22l4.93-1.39A9.957 9.957 0 0 0 12.004 22c5.523 0 10-4.48 10-10s-4.477-10-10-10zm0 1.5c4.694 0 8.5 3.806 8.5 8.5s-3.806 8.5-8.5 8.5c-1.636 0-3.155-.465-4.453-1.266l-.32-.2-.228.064-2.73.768.784-2.646-.07-.246A8.448 8.448 0 0 1 3.5 12c0-4.694 3.806-8.5 8.5-8.5zm-3.565 4.316c-.168 0-.395.064-.567.246-.173.183-.664.648-.664 1.583 0 .935.683 1.838.777 1.966.095.127 1.315 2.1 3.25 2.87.46.184.82.293 1.1.382.463.14.884.12 1.217.07.37-.055 1.144-.467 1.304-.917.16-.45.16-.836.112-.917-.048-.08-.176-.127-.37-.225-.192-.097-1.143-.564-1.32-.628-.176-.065-.304-.097-.432.096-.128.193-.496.628-.608.756-.112.128-.224.145-.417.048a5.274 5.274 0 0 1-1.547-.954 5.82 5.82 0 0 1-1.07-1.332c-.113-.193-.012-.298.084-.394.086-.086.192-.225.289-.338.096-.113.128-.193.192-.322.064-.13.032-.24-.016-.338-.048-.096-.432-1.045-.592-1.432-.156-.376-.315-.325-.432-.33l-.369-.006z" fill="#25D366"/></svg>
+            </button>
+          </div>
+          <datalist id="aseTecnicosSugeridos"></datalist>
+          <span id="aseTecnicoSinCelularMsg" class="tecnico-sin-celular-msg">No se encontró el celular de este técnico en la hoja Usuario.</span>
+        </div>
+
+        <div class="modal-data-group">
+          <span class="modal-data-label">Detalle de la solicitud</span>
+          <div class="modal-data-value" id="aseMdlFalla" style="white-space:normal; max-height:45px; overflow-y:auto;">—</div>
+        </div>
+
+        <div class="modal-data-group">
+          <span class="modal-data-label">Observaciones</span>
+          <div class="modal-data-value" id="aseMdlObservaciones" style="white-space:normal; max-height:45px; overflow-y:auto;">—</div>
+        </div>
+
+        <div class="modal-grid-row">
+          <div class="modal-data-group">
+            <span class="modal-data-label">💰 Costo</span>
+            <input type="number" class="modal-input" id="aseMdlCostoInput" placeholder="0">
+          </div>
+          <div class="modal-data-group">
+            <span class="modal-data-label">Estado</span>
+            <select class="modal-select" id="aseMdlEstadoSelect">
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="CONFIRMADA">Confirmada</option>
+              <option value="REALIZADA">Realizada</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-data-group">
+          <span class="modal-data-label">📝 Observación Final</span>
+          <textarea class="modal-textarea" id="aseMdlObsFinalInput" placeholder="Resultado de la asesoría…"></textarea>
+        </div>
+
+        <div class="modal-actions-container">
+          <span class="modal-data-label" style="display:block;">⚡ Acciones</span>
+
+          <button id="aseBtnGuardarCambios" class="sys-btn-guardar" onclick="guardarCambiosAse()">
+            💾 Guardar cambios
+          </button>
+
+          <button id="aseBtnEntregarModal" class="sys-btn-entregar" onclick="marcarRealizadaAse()">
+            ✅ Marcar como REALIZADA
+          </button>
+
+          <button id="aseBtnWaNotify" class="sys-btn-wa-notify" onclick="enviarWhatsAppAse()">
+            💬 Notificar por WhatsApp
+          </button>
+
+          <p id="aseMdlEntregadoMsg" style="display:none; text-align:center; font-size:11px; color:#047857; font-weight:600; margin:4px 0 0 0;">
+            ✅ Asesoría actualizada correctamente.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="aseToastMsg"></div>
+
+<script>
+(function () {
+  var todos = [], filtrados = [];
+  var pagina = 1, porPag = 12;
+  var sortCol = 'FechaIngreso', sortAsc = false;
+  var estadoFiltro = 'TODOS';
+  var itemActivo = null;
+  var listaTecnicos = [];
+  var mapaTecnicosCelular = {};
+
+  var waIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12.004 2C6.48 2 2 6.48 2 12c0 1.908.533 3.69 1.454 5.215L2 22l4.93-1.39A9.957 9.957 0 0 0 12.004 22c5.523 0 10-4.48 10-10s-4.477-10-10-10zm0 1.5c4.694 0 8.5 3.806 8.5 8.5s-3.806 8.5-8.5 8.5c-1.636 0-3.155-.465-4.453-1.266l-.32-.2-.228.064-2.73.768.784-2.646-.07-.246A8.448 8.448 0 0 1 3.5 12c0-4.694 3.806-8.5 8.5-8.5zm-3.565 4.316c-.168 0-.395.064-.567.246-.173.183-.664.648-.664 1.583 0 .935.683 1.838.777 1.966.095.127 1.315 2.1 3.25 2.87.46.184.82.293 1.1.382.463.14.884.12 1.217.07.37-.055 1.144-.467 1.304-.917.16-.45.16-.836.112-.917-.048-.08-.176-.127-.37-.225-.192-.097-1.143-.564-1.32-.628-.176-.065-.304-.097-.432.096-.128.193-.496.628-.608.756-.112.128-.224.145-.417.048a5.274 5.274 0 0 1-1.547-.954 5.82 5.82 0 0 1-1.07-1.332c-.113-.193-.012-.298.084-.394.086-.086.192-.225.289-.338.096-.113.128-.193.192-.322.064-.13.032-.24-.016-.338-.048-.096-.432-1.045-.592-1.432-.156-.376-.315-.325-.432-.33l-.369-.006z" fill="#25D366"/></svg>';
+
+  function parseFechaISO(v) {
+    if (!v) return null;
+    var s = String(v).trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+      var p = s.split('/');
+      return new Date(p[2], p[1]-1, p[0]);
+    }
+    var d = new Date(v);
+    return isNaN(d) ? null : d;
+  }
+
+  function fmtFecha(v) {
+    var d = parseFechaISO(v);
+    return d ? String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear() : String(v||'—');
+  }
+
+  function fmtCosto(v) {
+    if (!v && v !== 0) return '—';
+    var n = parseFloat(String(v).replace(/[^0-9.,-]/g,'').replace(',','.'));
+    if (isNaN(n)) return String(v);
+    return '$ ' + n.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function fmtTecnico(v) {
+    var t = (v || '').toString().trim();
+    return t
+      ? '<span class="tecnico-pill">' + t + '</span>'
+      : '<span class="tecnico-pill tecnico-sin-asignar">Sin asignar</span>';
+  }
+
+  // Prioridad de estado: PENDIENTE primero, luego CONFIRMADA, REALIZADA/CANCELADA al final
+  function prioridadEstadoAse(estado) {
+    var e = (estado || '').toUpperCase().trim();
+    if (e === 'PENDIENTE') return 0;
+    if (e === 'CONFIRMADA') return 1;
+    return 2; // REALIZADA, CANCELADA u otros
+  }
+
+  // Normaliza un nombre para comparar sin importar mayúsculas, tildes o espacios extra.
+  // Se usa para hacer coincidir "Técnico Asignado" con el Nombre de la hoja Usuario.
+  function normalizeNombreAse(s) {
+    return String(s || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // "dd/MM/yyyy HH:mm" -> "yyyy-MM-ddTHH:mm" (para precargar el input datetime-local)
+  function displayToDatetimeLocal(v) {
+    if (!v) return '';
+    var partes = String(v).trim().split(' ');
+    var dParts = (partes[0] || '').split('/');
+    var hora   = partes[1] || '00:00';
+    if (dParts.length !== 3) return '';
+    return dParts[2] + '-' + dParts[1] + '-' + dParts[0] + 'T' + hora;
+  }
+
+  // "yyyy-MM-ddTHH:mm" -> "dd/MM/yyyy HH:mm" (para refrescar la tabla tras guardar)
+  function datetimeLocalToDisplay(v) {
+    if (!v) return '—';
+    var partes = String(v).split('T');
+    var dParts = (partes[0] || '').split('-');
+    if (dParts.length !== 3) return v;
+    var hora = partes[1] || '';
+    return dParts[2] + '/' + dParts[1] + '/' + dParts[0] + (hora ? ' ' + hora : '');
+  }
+
+  function badge(estado) {
+    var e = (estado || '').toUpperCase().trim();
+    var mapa = {
+      'PENDIENTE' : 'st-pendiente',
+      'CONFIRMADA': 'st-confirmada',
+      'REALIZADA' : 'st-realizada',
+      'CANCELADA' : 'st-cancelada'
+    };
+    return '<span class="status-pill ' + (mapa[e] || 'st-pendiente') + '">' + (estado||'—') + '</span>';
+  }
+
+  function toast(msg, duration) {
+    var el = document.getElementById('aseToastMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(function(){ el.classList.remove('show'); }, duration || 2800);
+  }
+
+window.cargarAsesorias = function () {
+  var token = sessionStorage.getItem('vip_token');
+  if (!token) {
+    document.getElementById('aseBodyTable').innerHTML =
+      '<tr><td colspan="11" style="text-align:center;padding:40px;color:#b91c1c;">Sesión no encontrada. Vuelve a iniciar sesión.</td></tr>';
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function (data) {
+      todos = data || [];
+      metricasAse();
+      filtrarTodoAse();
+    })
+    .withFailureHandler(function (err) {
+      document.getElementById('aseBodyTable').innerHTML =
+        '<tr><td colspan="11" style="text-align:center;padding:40px;color:#b91c1c;">' +
+        (err && err.message ? err.message : 'Error al cargar las asesorías.') +
+        '</td></tr>';
+    })
+    .getAsesorias(token);
+};
+
+  function cargarTecnicos() {
+    google.script.run
+      .withSuccessHandler(function (nombres) {
+        listaTecnicos = nombres || [];
+        var dl = document.getElementById('aseTecnicosSugeridos');
+        dl.innerHTML = '';
+        listaTecnicos.forEach(function (n) {
+          var op = document.createElement('option');
+          op.value = n;
+          dl.appendChild(op);
+        });
+      })
+      .getTecnicos();
+  }
+
+  // Trae {Nombre, Celular} de cada técnico (hoja Usuario, columna F = Celular) para
+  // poder avisarle por WhatsApp que se le asignó una asesoría. Es una llamada aparte
+  // de cargarTecnicos() para no romper el autocompletado si el backend aún no tiene
+  // esta función: si falla, simplemente no se podrá notificar por WhatsApp.
+  function cargarTecnicosCelulares() {
+    google.script.run
+      .withSuccessHandler(function (lista) {
+        mapaTecnicosCelular = {};
+        (lista || []).forEach(function (t) {
+          var nombre  = t && (t.Nombre || t.nombre);
+          var celular = t && (t.Celular || t.celular);
+          if (nombre && celular) {
+            mapaTecnicosCelular[normalizeNombreAse(nombre)] = String(celular).replace(/\D/g, '');
+          }
+        });
+        actualizarBotonWaTecnicoAse();
+      })
+      .withFailureHandler(function (err) {
+        console.warn('No se pudo cargar el celular de los técnicos (falta getTecnicosConCelular en el backend):', err);
+      })
+      .getTecnicosConCelular();
+  }
+
+  window.filtrarPorEstadoAse = function(val) {
+    estadoFiltro = val;
+    pagina = 1;
+    filtrarTodoAse();
+  };
+
+  window.filtrarTodoAse = function () {
+    var q = (document.getElementById('aseSearchInput').value || '').toLowerCase().trim();
+    var fFrom = document.getElementById('aseDateFrom').value;
+    var fTo   = document.getElementById('aseDateTo').value;
+    var dFrom = fFrom ? new Date(fFrom + 'T00:00:00') : null;
+    var dTo   = fTo   ? new Date(fTo   + 'T23:59:59') : null;
+
+    filtrados = todos.filter(function(r) {
+      var cumpleBusqueda = !q || ['Nombre','IdIngreso','Solicitud','Celular','Fallas','Observaciones','ObservacionFinal','TecnicoAsignado'].some(function(k){
+        return String(r[k]||'').toLowerCase().indexOf(q) > -1;
+      });
+
+      var cumpleEstado = true;
+      if (estadoFiltro !== 'TODOS') {
+        cumpleEstado = ((r.Estado||'').toUpperCase() === estadoFiltro);
+      }
+
+      var cumpleFecha = true;
+      if (dFrom || dTo) {
+        var fechaReg = parseFechaISO(r.FechaIngreso);
+        if (fechaReg) {
+          if (dFrom && fechaReg < dFrom) cumpleFecha = false;
+          if (dTo   && fechaReg > dTo)   cumpleFecha = false;
+        } else {
+          cumpleFecha = false;
+        }
+      }
+      return cumpleBusqueda && cumpleEstado && cumpleFecha;
+    });
+
+    filtrados.sort(function(a,b){
+      var pa = prioridadEstadoAse(a.Estado);
+      var pb = prioridadEstadoAse(b.Estado);
+      if (pa !== pb) return pa - pb;
+
+      return sortAsc
+        ? String(a[sortCol]).localeCompare(String(b[sortCol]))
+        : String(b[sortCol]).localeCompare(String(a[sortCol]));
+    });
+
+    renderTablaAse();
+  };
+
+  window.sortByAse = function(col) {
+    sortAsc = sortCol === col ? !sortAsc : true;
+    sortCol = col;
+    filtrarTodoAse();
+  };
+
+  function renderTablaAse() {
+    var tbody = document.getElementById('aseBodyTable');
+    var total = filtrados.length;
+    var inicio = (pagina-1)*porPag;
+    var fin = Math.min(inicio+porPag, total);
+    var slice = filtrados.slice(inicio, fin);
+
+    document.getElementById('asePagInfo').textContent = total === 0
+      ? 'Sin registros'
+      : 'Registros ' + (inicio+1) + ' al ' + fin + ' de ' + total;
+    document.getElementById('aseBtnPrev').disabled = pagina <= 1;
+    document.getElementById('aseBtnNext').disabled = fin >= total;
+
+    if (!slice.length) {
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--sys-gray-700);">Ninguna asesoría bajo este criterio.</td></tr>';
+      return;
+    }
+
+    var html = '';
+    slice.forEach(function(r) {
+      var realIdx = todos.indexOf(r);
+      var waLink = r.Celular ? 'https://wa.me/57' + String(r.Celular).replace(/\D/g,'') : '#';
+      var waBoton = r.Celular
+        ? '<a href="'+waLink+'" target="_blank" class="wa-icon-link" onclick="event.stopPropagation()">' + waIconSvg + '</a>'
+        : '—';
+
+      var detalleTxt = r.Fallas || '—';
+      var detalleTrunc = detalleTxt.length > 40 ? detalleTxt.substring(0,40) + '…' : detalleTxt;
+
+      html += '<tr onclick="abrirDetalleAse('+realIdx+')">' +
+        '<td data-label="" class="td-wa-cell" style="text-align:center; padding:8px !important;">' + waBoton + '</td>' +
+        '<td data-label="Fecha">' + fmtFecha(r.FechaIngreso) + '</td>' +
+        '<td data-label="ID" class="wrap-text" style="font-family:\'IBM Plex Mono\',monospace; font-size:12px; font-weight:600;">#' + (r.IdIngreso||'—') + '</td>' +
+        '<td data-label="Cliente"><b>' + (r.Nombre||'—') + '</b></td>' +
+        '<td data-label="Celular">' + (r.Celular||'—') + '</td>' +
+        '<td data-label="Solicitud">' + (r.Solicitud||'—') + '</td>' +
+        '<td data-label="Técnico">' + fmtTecnico(r.TecnicoAsignado) + '</td>' +
+        '<td data-label="F. Visita">' + (r.FechaVisita||'—') + '</td>' +
+        '<td data-label="Detalle" class="wrap-text">' + detalleTrunc + '</td>' +
+        '<td data-label="Costo"><span class="costo-valor">' + fmtCosto(r.Costo) + '</span></td>' +
+        '<td data-label="Estado">' + badge(r.Estado) + '</td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function bloquearFormularioAse(bloquear) {
+    document.getElementById('aseMdlFechaVisitaInput').disabled = bloquear;
+    document.getElementById('aseMdlCostoInput').disabled       = bloquear;
+    document.getElementById('aseMdlEstadoSelect').disabled     = bloquear;
+    document.getElementById('aseMdlObsFinalInput').disabled    = bloquear;
+    document.getElementById('aseMdlTecnicoInput').disabled      = bloquear;
+    document.getElementById('aseBtnGuardarCambios').disabled   = bloquear;
+  }
+
+  window.abrirDetalleAse = function(index) {
+    var item = todos[index];
+    if (!item) return;
+    itemActivo = { item: item, index: index };
+
+    document.getElementById('aseMdlTicketCode').textContent = 'Asesoría #' + (item.IdIngreso||'S/I');
+    document.getElementById('aseMdlFecha').textContent        = fmtFecha(item.FechaIngreso);
+    document.getElementById('aseMdlFechaVisitaInput').value   = displayToDatetimeLocal(item.FechaVisita);
+    document.getElementById('aseMdlCliente').textContent      = item.Nombre    || '—';
+    document.getElementById('aseMdlCelular').textContent      = item.Celular   || '—';
+    document.getElementById('aseMdlSolicitud').textContent    = item.Solicitud || '—';
+    document.getElementById('aseMdlFalla').textContent        = item.Fallas    || 'Sin detalle registrado.';
+    document.getElementById('aseMdlObservaciones').textContent= item.Observaciones || 'Sin observaciones.';
+
+    document.getElementById('aseMdlCostoInput').value    = item.Costo || '';
+    document.getElementById('aseMdlEstadoSelect').value  = (item.Estado || 'PENDIENTE').toUpperCase();
+    document.getElementById('aseMdlObsFinalInput').value = item.ObservacionFinal || '';
+
+    document.getElementById('aseMdlTecnicoInput').value = item.TecnicoAsignado || '';
+    actualizarBotonWaTecnicoAse();
+
+    var yaRealizada = (item.Estado||'').toUpperCase() === 'REALIZADA';
+    var btn = document.getElementById('aseBtnEntregarModal');
+    var msg = document.getElementById('aseMdlEntregadoMsg');
+    btn.disabled = yaRealizada;
+    btn.textContent = yaRealizada ? '✅ Ya fue marcada como REALIZADA' : '✅ Marcar como REALIZADA';
+
+    bloquearFormularioAse(yaRealizada);
+    if (yaRealizada) {
+      msg.textContent = '🔒 Esta asesoría ya fue REALIZADA. El servicio quedó completado y no admite más ediciones.';
+      msg.style.display = 'block';
+    } else {
+      msg.style.display = 'none';
+    }
+
+    document.getElementById('aseModal').style.display = 'flex';
+  };
+
+  // Muestra u oculta el ícono de WhatsApp junto al campo de técnico según si el
+  // nombre escrito coincide con un técnico que tenga celular registrado.
+  window.actualizarBotonWaTecnicoAse = function() {
+    var input = document.getElementById('aseMdlTecnicoInput');
+    var btn = document.getElementById('aseBtnWaTecnico');
+    var msgSinCelular = document.getElementById('aseTecnicoSinCelularMsg');
+    var nombre = (input.value || '').trim();
+
+    if (!nombre) {
+      btn.style.display = 'none';
+      msgSinCelular.style.display = 'none';
+      return;
+    }
+
+    var celular = mapaTecnicosCelular[normalizeNombreAse(nombre)];
+    if (celular) {
+      btn.style.display = 'inline-flex';
+      msgSinCelular.style.display = 'none';
+    } else {
+      btn.style.display = 'none';
+      msgSinCelular.style.display = 'block';
+    }
+  };
+
+  // Envía por WhatsApp al técnico un mensaje avisando que se le asignó esta asesoría.
+  // El celular se busca en mapaTecnicosCelular (hoja Usuario, columna F = Celular),
+  // haciendo coincidir el Nombre con lo escrito en "Técnico Asignado".
+  window.notificarTecnicoAse = function() {
+    if (!itemActivo) return;
+    var item = itemActivo.item;
+    var nombreTecnico = (document.getElementById('aseMdlTecnicoInput').value || '').trim();
+    if (!nombreTecnico) {
+      toast('⚠️ Escribe primero el nombre del técnico.', 3000);
+      return;
+    }
+    var celular = mapaTecnicosCelular[normalizeNombreAse(nombreTecnico)];
+    if (!celular) {
+      toast('⚠️ No se encontró el celular de "' + nombreTecnico + '" en la hoja Usuario.', 3500);
+      return;
+    }
+
+    var fechaVisitaInputVal = document.getElementById('aseMdlFechaVisitaInput').value;
+    var fechaVisitaTxt = fechaVisitaInputVal ? datetimeLocalToDisplay(fechaVisitaInputVal) : (item.FechaVisita || 'Por definir');
+
+    var msj = "Hola " + nombreTecnico + ", te informamos de VIP TECHONOLOGY que se te ha asignado la asesoría #" +
+      (item.IdIngreso || '') + " del cliente " + (item.Nombre || '') +
+      (item.Celular ? " (Cel: " + item.Celular + ")" : "") +
+      ". Solicitud: " + (item.Solicitud || 'Sin especificar') +
+      ". Fecha y hora de visita: " + fechaVisitaTxt +
+      ". Detalle: " + (item.Fallas || 'Sin detalle registrado') + ".";
+
+    var url = "https://wa.me/57" + celular + "?text=" + encodeURIComponent(msj);
+    window.open(url, '_blank');
+  };
+
+window.guardarCambiosAse = function() {
+  if (!itemActivo) return;
+  var token = sessionStorage.getItem('vip_token');
+  if (!token) {
+    toast('⚠️ Sesión no encontrada. Vuelve a iniciar sesión.', 3500);
+    return;
+  }
+
+  var btn = document.getElementById('aseBtnGuardarCambios');
+  btn.disabled = true;
+  btn.textContent = '⏳ Guardando...';
+
+  var payload = {
+    token           : token,
+    id              : itemActivo.item.IdIngreso,
+    estado          : document.getElementById('aseMdlEstadoSelect').value,
+    costo           : document.getElementById('aseMdlCostoInput').value,
+    observacionFinal: document.getElementById('aseMdlObsFinalInput').value,
+    fechaVisita     : document.getElementById('aseMdlFechaVisitaInput').value,
+    tecnico         : document.getElementById('aseMdlTecnicoInput').value.trim()
+  };
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.textContent = '💾 Guardar cambios';
+      if (res && res.ok) {
+        itemActivo.item.Estado           = payload.estado;
+        itemActivo.item.Costo            = payload.costo;
+        itemActivo.item.ObservacionFinal = payload.observacionFinal;
+        itemActivo.item.TecnicoAsignado  = payload.tecnico;
+        if (payload.fechaVisita) {
+          itemActivo.item.FechaVisita = datetimeLocalToDisplay(payload.fechaVisita);
+        }
+        todos[itemActivo.index] = itemActivo.item;
+
+        var yaRealizada = payload.estado === 'REALIZADA';
+        var btnR = document.getElementById('aseBtnEntregarModal');
+        btnR.disabled = yaRealizada;
+        btnR.textContent = yaRealizada ? '✅ Ya fue marcada como REALIZADA' : '✅ Marcar como REALIZADA';
+
+        bloquearFormularioAse(yaRealizada);
+        if (yaRealizada) {
+          document.getElementById('aseMdlEntregadoMsg').textContent = '🔒 Esta asesoría ya fue REALIZADA. El servicio quedó completado y no admite más ediciones.';
+          document.getElementById('aseMdlEntregadoMsg').style.display = 'block';
+        }
+
+        metricasAse();
+        renderTablaAse();
+        toast('✅ Cambios guardados correctamente.');
+      } else {
+        toast('⚠️ ' + (res && res.error ? res.error : 'No se pudo guardar.'), 3500);
+      }
+    })
+    .withFailureHandler(function() {
+      btn.disabled = false;
+      btn.textContent = '💾 Guardar cambios';
+      toast('❌ Error al conectar con el servidor.', 3500);
+    })
+    .updateAsesoriaBackend(payload);
+};
+
+window.marcarRealizadaAse = function() {
+  if (!itemActivo) return;
+  var token = sessionStorage.getItem('vip_token');
+  if (!token) {
+    toast('⚠️ Sesión no encontrada. Vuelve a iniciar sesión.', 3500);
+    return;
+  }
+
+  var btn = document.getElementById('aseBtnEntregarModal');
+  btn.disabled = true;
+  btn.textContent = '⏳ Guardando...';
+
+  google.script.run
+    .withSuccessHandler(function(ok) {
+      if (ok) {
+        itemActivo.item.Estado = 'REALIZADA';
+        todos[itemActivo.index].Estado = 'REALIZADA';
+
+        document.getElementById('aseMdlEstadoSelect').value = 'REALIZADA';
+        btn.textContent = '✅ Ya fue marcada como REALIZADA';
+
+        bloquearFormularioAse(true);
+        document.getElementById('aseMdlEntregadoMsg').textContent = '✅ Asesoría marcada como REALIZADA. El formulario quedó bloqueado.';
+        document.getElementById('aseMdlEntregadoMsg').style.display = 'block';
+
+        metricasAse();
+        renderTablaAse();
+        toast('✅ Estado actualizado a REALIZADA correctamente.');
+      } else {
+        btn.disabled = false;
+        btn.textContent = '✅ Marcar como REALIZADA';
+        toast('⚠️ No se pudo guardar. Intente de nuevo.', 3500);
+      }
+    })
+    .withFailureHandler(function() {
+      btn.disabled = false;
+      btn.textContent = '✅ Marcar como REALIZADA';
+      toast('❌ Error al conectar con el servidor.', 3500);
+    })
+    .actualizarEstadoAsesoria(itemActivo.item.IdIngreso, 'REALIZADA', token);
+};
+  window.enviarWhatsAppAse = function() {
+    if (!itemActivo || !itemActivo.item) return;
+    var item = itemActivo.item;
+
+    if (!item.Celular) {
+      toast('⚠️ Este registro no tiene número de celular registrado.', 3000);
+      return;
+    }
+
+    var numLimpio = String(item.Celular).replace(/\D/g,'');
+    var estadoActual = (item.Estado || '').toUpperCase().trim();
+    var msj;
+
+    if (estadoActual === 'REALIZADA') {
+      var now = new Date();
+      var dia = String(now.getDate()).padStart(2, '0');
+      var mes = String(now.getMonth() + 1).padStart(2, '0');
+      var anio = now.getFullYear();
+      var horas = String(now.getHours()).padStart(2, '0');
+      var minutos = String(now.getMinutes()).padStart(2, '0');
+      var fechaHoraActual = dia + '/' + mes + '/' + anio + ', ' + horas + ':' + minutos;
+      var observacionFinalTxt = item.ObservacionFinal ? item.ObservacionFinal : 'Sin observaciones adicionales.';
+
+      msj = "Hola " + (item.Nombre || 'Cliente') + " ,Le escribimos de VIP TECHONOLOGY, tu asesoría \"" + (item.Solicitud || '') + "\" cambió a estado REALIZADA. Se cierra asesoría el " + fechaHoraActual + ". Observación final: " + observacionFinalTxt + ". ¡Gracias por confiar en nosotros!";
+    } else {
+      var fechaVisitaTxt = item.FechaVisita ? item.FechaVisita : 'Aún no agendada';
+      var tecnicoTxt = item.TecnicoAsignado ? item.TecnicoAsignado : 'Por asignar';
+      msj = "Hola " + (item.Nombre || 'Cliente') + " ,Le escribimos de VIP TECHONOLOGY, te confirmamos información sobre tu asesoría \"" + (item.Solicitud || '') + "\". Estado actual: " + (item.Estado || '') + ". Técnico asignado: " + tecnicoTxt + ". Fecha que se realizara visita " + fechaVisitaTxt + ". ¡Gracias por confiar en nosotros!";
+    }
+
+    var url = "https://wa.me/57" + numLimpio + "?text=" + encodeURIComponent(msj);
+    window.open(url, '_blank');
+  };
+
+  window.cerrarModalAse = function() {
+    document.getElementById('aseModal').style.display = 'none';
+    itemActivo = null;
+  };
+
+  window.cambiarPagAse = function(dir) { pagina += dir; renderTablaAse(); };
+
+  function metricasAse() {
+    var t     = todos.length;
+    var pend  = todos.filter(function(r){ return (r.Estado||'').toUpperCase() === 'PENDIENTE'; }).length;
+    var conf  = todos.filter(function(r){ return (r.Estado||'').toUpperCase() === 'CONFIRMADA'; }).length;
+    var real  = todos.filter(function(r){ return (r.Estado||'').toUpperCase() === 'REALIZADA'; }).length;
+    var cance = todos.filter(function(r){ return (r.Estado||'').toUpperCase() === 'CANCELADA'; }).length;
+
+    document.getElementById('aseTotal').textContent       = t;
+    document.getElementById('asePendientes').textContent  = pend;
+    document.getElementById('aseConfirmadas').textContent = conf;
+    document.getElementById('aseRealizadas').textContent  = real;
+    document.getElementById('aseCanceladas').textContent  = cance;
+  }
+
+  cargarAsesorias();
+  cargarTecnicos();
+  cargarTecnicosCelulares();
+})();
+</script>

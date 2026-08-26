@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#7e22ce" />
+  <title>VIP TECHNOLOGY</title>
+  <link rel="stylesheet" href="/src/styles/tailwind.css" />
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans">
+
+  <!-- Modal de login -->
+  <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/85 backdrop-blur-sm">
+    <form id="login-form" class="w-full max-w-sm rounded-xl bg-white p-8 shadow-2xl">
+      <h2 class="text-xl font-extrabold text-slate-900">Iniciar sesión</h2>
+      <p class="mb-5 text-sm text-slate-500">VIP TECHNOLOGY</p>
+
+      <div id="login-error" class="mb-3 hidden text-sm text-red-600"></div>
+
+      <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-usuario">Usuario</label>
+      <input id="login-usuario" type="text" required autocomplete="username"
+             class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent focus:outline-none" />
+
+      <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-clave">Contraseña</label>
+      <input id="login-clave" type="password" required autocomplete="current-password"
+             class="mb-5 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent focus:outline-none" />
+
+      <button id="login-btn" type="submit"
+              class="w-full rounded-md bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-dark">
+        Ingresar
+      </button>
+    </form>
+  </div>
+
+  <!-- Shell de la app -->
+  <div id="app-shell" class="mx-auto max-w-4xl px-4 pb-16 pt-6">
+    <header class="mb-6 flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+      <div class="flex flex-col">
+        <span class="text-lg font-extrabold tracking-wide text-slate-900">VIP TECHNOLOGY</span>
+        <span class="text-xs font-medium text-slate-500">Servicio Técnico Especializado</span>
+      </div>
+      <span id="user-badge" class="ml-2 text-xs text-slate-400"></span>
+      <button id="logout-btn"
+              class="ml-auto rounded-md border border-accent px-3 py-1.5 text-xs font-bold text-accent transition hover:bg-accent hover:text-white">
+        🚪 Cerrar sesión
+      </button>
+    </header>
+
+    <main id="main-content"></main>
+  </div>
+
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>

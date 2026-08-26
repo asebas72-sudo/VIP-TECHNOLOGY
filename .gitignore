@@ -1,0 +1,23 @@
+# Secretos / credenciales — nunca se commitean
+**/.env
+**/.env.local
+legacy/.clasprc.json
+legacy/.clasp.json
+
+# Datos reales de clientes (cédulas, celulares, correos) — no debe vivir en git,
+# ni siquiera en un repo privado. Se usa localmente para scripts/migrate_xlsx_to_supabase.py.
+legacy/VIP.xlsx
+
+# Dependencias / build
+frontend/node_modules/
+frontend/dist/
+frontend/dev-dist/
+
+# Supabase CLI local
+supabase/.branches/
+supabase/.temp/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

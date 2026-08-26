@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('Stylesheet'); ?>
+  <style>
+    .login-wrap { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#f1f5f9; }
+    .login-card { background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.08); width:100%; max-width:340px; }
+    .login-card h2 { margin:0 0 4px; color:#0f172a; }
+    .login-card p { margin:0 0 20px; color:#64748b; font-size:13px; }
+    .login-card input { width:100%; padding:10px 12px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:8px; box-sizing:border-box; font-size:14px; }
+    .login-card button { width:100%; padding:10px; border:none; border-radius:8px; background:#7e22ce; color:#fff; font-weight:bold; cursor:pointer; font-size:14px; }
+    .login-card button:disabled { opacity:0.6; cursor:not-allowed; }
+    .login-error { color:#dc2626; font-size:13px; min-height:18px; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <form class="login-card" id="loginForm" onsubmit="return false;">
+      <h2>VIP TECHNOLOGY</h2>
+      <p>Ingresa tus credenciales para continuar</p>
+      <div class="login-error" id="loginError"></div>
+      <input type="text" id="usuario" placeholder="Usuario" autocomplete="username">
+      <input type="password" id="clave" placeholder="Clave" autocomplete="current-password">
+      <button type="button" id="btnLogin" onclick="hacerLogin()">Ingresar</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('clave').addEventListener('keyup', function (e) {
+      if (e.key === 'Enter') hacerLogin();
+    });
+
+    function hacerLogin() {
+      var usuario = document.getElementById('usuario').value.trim();
+      var clave   = document.getElementById('clave').value.trim();
+      var errBox  = document.getElementById('loginError');
+      var btn     = document.getElementById('btnLogin');
+      errBox.textContent = '';
+
+      if (!usuario || !clave) {
+        errBox.textContent = 'Completa usuario y clave.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Ingresando...';
+
+      google.script.run
+        .withSuccess(function (res) {
+          btn.disabled = false;
+          btn.textContent = 'Ingresar';
+          if (res.ok) {
+            sessionStorage.setItem('vip_token', res.token);
+            sessionStorage.setItem('vip_nombre', res.nombre);
+            sessionStorage.setItem('vip_rol', res.rol);
+            sessionStorage.setItem('vip_esAdmin', res.esAdmin ? '1' : '0');
+            window.top.location.reload();
+          } else {
+            errBox.textContent = res.error;
+          }
+        })
+        .withFailure(function (err) {
+          btn.disabled = false;
+          btn.textContent = 'Ingresar';
+          errBox.textContent = 'Error de conexión: ' + err.message;
+        })
+        .login(usuario, clave);
+    }
+  </script>
+</body>
+</html>

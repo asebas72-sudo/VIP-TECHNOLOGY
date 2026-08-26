@@ -1,0 +1,266 @@
+<div class="page-header">
+  <button class="btn btn-ghost" onclick="loadPage('asesorias')">← Asesorías</button>
+  <h2>Registrar solicitud de asesoría</h2>
+</div>
+
+<div id="asesoriaWrap">
+  <div id="asesoriaAlert"></div>
+
+  <div class="form-layout">
+    <form class="form-card" id="asesoriaForm">
+
+      <div class="field-group">
+        <label for="ase_cedula">Cédula</label>
+        <input type="tel" id="ase_cedula" inputmode="numeric" placeholder="Escribe la cédula para buscar cliente…" autocomplete="off">
+        <span id="ase_cedulaHint" style="font-size:12px; color:#64748b; margin-top:4px; display:none;">🔍 Buscando cliente…</span>
+      </div>
+
+      <div class="field-group">
+        <label for="ase_nombre">Nombre del cliente</label>
+        <input type="text" id="ase_nombre" placeholder="Ej: Laura Gómez" autocomplete="off">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="ase_celular">Celular</label>
+          <input type="tel" id="ase_celular" inputmode="numeric" placeholder="Solo números" autocomplete="off">
+        </div>
+        <div class="field-group">
+          <label for="ase_emailUser">Correo del cliente</label>
+          <input type="email" id="ase_emailUser" placeholder="correo@ejemplo.com" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="ase_solicitud">Tipo de asesoría</label>
+        <select id="ase_solicitud">
+          <option value="">Selecciona…</option>
+          <option value="Instalación de software">Instalación de software</option>
+          <option value="Configuración de red">Configuración de red</option>
+          <option value="Mantenimiento CCTV">Mantenimiento CCTV</option>
+          <option value="Instalacion CCTV">Instalacion CCTV</option>
+          <option value="Revision Camaras">Revision Camaras</option>
+          <option value="Visita Tecnica">Visita Tecnica</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="ase_fallas">Detalle de la solicitud / novedad</label>
+        <textarea id="ase_fallas" placeholder="¿Qué necesita el cliente?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="ase_observaciones">Observaciones</label>
+        <textarea id="ase_observaciones" placeholder="Detalles adicionales…"></textarea>
+      </div>
+
+      <p class="section-label">Foto de referencia (opcional)</p>
+      <div class="field-group">
+        <div class="photo-drop">
+          <input type="file" id="ase_fotoInput" accept="image/*" capture="environment">
+          <p class="field-hint">Toma una foto o sube una imagen relacionada con la asesoría.</p>
+          <img id="ase_fotoPreview" class="photo-preview" alt="Foto de referencia">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="ase_btnGuardar" style="width:100%; margin-top:6px;">
+        Guardar solicitud
+      </button>
+    </form>
+
+    <aside class="ticket" id="ase_ticketPreview">
+      <span class="ticket-eyebrow">Vista previa</span>
+      <div class="ticket-row"><span>Cliente</span><span id="ase_pvCliente">—</span></div>
+      <div class="ticket-row"><span>Solicitud</span><span id="ase_pvSolicitud">—</span></div>
+      <div class="ticket-codigo" id="ase_pvId">Se genera al guardar</div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  var fotoBase64    = '';
+  var ultimoCelular = '';
+
+  var WHATSAPP_MENSAJE_TEMPLATE =
+    'Hola {nombre} \u{1F44B}\n' +
+    'Tu solicitud de asesoría *{solicitud}* fue registrada en *VIP TECHNOLOGY*.\n\n' +
+    '\u{1F9FE} ID de solicitud: *{id}*\n' +
+    '\u{1F4C5} Fecha de solicitud: {fechaIngreso}\n\n' +
+    'Pronto confirmaremos contigo los detalles.\n' +
+    '¡Gracias por confiar en nosotros!';
+
+  function construirMensajeWhatsapp(res) {
+    return WHATSAPP_MENSAJE_TEMPLATE
+      .replace(/{nombre}/g,       res.nombre       || '')
+      .replace(/{solicitud}/g,    res.solicitud    || '')
+      .replace(/{id}/g,           res.idAsesoria   || '')
+      .replace(/{fechaIngreso}/g, res.fechaIngreso || '');
+  }
+
+  function waLink(celular, texto) {
+    var digits = String(celular || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length === 10) digits = '57' + digits;
+    return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(texto);
+  }
+
+  /* ---------- Vista previa ---------- */
+  function actualizarPreview() {
+    document.getElementById('ase_pvCliente').textContent   = document.getElementById('ase_nombre').value || '—';
+    document.getElementById('ase_pvSolicitud').textContent = document.getElementById('ase_solicitud').value || '—';
+  }
+  ['ase_nombre'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', actualizarPreview);
+  });
+  document.getElementById('ase_solicitud').addEventListener('change', actualizarPreview);
+
+  /* ---------- Autocompletado por cédula ---------- */
+  var cedulaInput = document.getElementById('ase_cedula');
+  var cedulaHint  = document.getElementById('ase_cedulaHint');
+
+  cedulaInput.addEventListener('blur', function () {
+    var ced = this.value.replace(/\D/g, '').trim();
+    if (ced.length < 4) return;
+
+    cedulaHint.style.display = 'block';
+    cedulaHint.textContent   = '🔍 Buscando cliente…';
+
+    google.script.run
+      .withSuccessHandler(function (cliente) {
+        cedulaHint.style.display = 'none';
+        if (!cliente) return;
+
+        var campoNombre  = document.getElementById('ase_nombre');
+        var campoCelular = document.getElementById('ase_celular');
+        var campoEmail   = document.getElementById('ase_emailUser');
+
+        if (cliente.nombre  && !campoNombre.value.trim())  campoNombre.value  = cliente.nombre;
+        if (cliente.celular && !campoCelular.value.trim()) campoCelular.value = cliente.celular;
+        if (cliente.correo  && !campoEmail.value.trim())   campoEmail.value   = cliente.correo;
+
+        actualizarPreview();
+
+        cedulaHint.style.display = 'block';
+        cedulaHint.style.color   = '#16a34a';
+        cedulaHint.textContent   = '✅ Cliente encontrado: ' + (cliente.nombre || '');
+        setTimeout(function () {
+          cedulaHint.style.display = 'none';
+          cedulaHint.style.color   = '#64748b';
+        }, 3000);
+      })
+      .withFailureHandler(function () {
+        cedulaHint.style.display = 'none';
+      })
+      .buscarClientePorCedula(ced);
+  });
+
+  /* ---------- Foto ---------- */
+  document.getElementById('ase_fotoInput').addEventListener('change', function (evt) {
+    var file = evt.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      fotoBase64 = e.target.result;
+      var img = document.getElementById('ase_fotoPreview');
+      img.src           = fotoBase64;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ---------- Alertas ---------- */
+  function mostrarErrores(lista) {
+    var html = '<div class="form-alert error"><strong>Revisa lo siguiente:</strong><ul>';
+    lista.forEach(function (e) { html += '<li>' + e + '</li>'; });
+    html += '</ul></div>';
+    document.getElementById('asesoriaAlert').innerHTML = html;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function limpiarAlertas() { document.getElementById('asesoriaAlert').innerHTML = ''; }
+
+  /* ---------- Envío ---------- */
+  document.getElementById('asesoriaForm').addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    limpiarAlertas();
+
+    var nombre        = document.getElementById('ase_nombre').value.trim();
+    var cedula        = document.getElementById('ase_cedula').value.replace(/\D/g, '').trim();
+    var celular       = document.getElementById('ase_celular').value.replace(/\D/g, '').trim();
+    var solicitud     = document.getElementById('ase_solicitud').value;
+    var fallas        = document.getElementById('ase_fallas').value.trim();
+    var observaciones = document.getElementById('ase_observaciones').value.trim();
+    var emailUser     = document.getElementById('ase_emailUser').value.trim();
+
+    var errores = [];
+    if (!nombre)    errores.push('El nombre es obligatorio.');
+    if (!cedula)    errores.push('La cédula debe contener solo números.');
+    if (!celular)   errores.push('El celular debe contener solo números.');
+    if (!solicitud) errores.push('Selecciona el tipo de asesoría.');
+
+    if (errores.length) { mostrarErrores(errores); return; }
+
+    ultimoCelular = celular;
+
+    var btn = document.getElementById('ase_btnGuardar');
+    btn.disabled    = true;
+    btn.textContent = 'Guardando…';
+
+    var payload = {
+      nombre: nombre, cedula: cedula, celular: celular,
+      solicitud: solicitud,
+      fallas: fallas, observaciones: observaciones, emailUser: emailUser,
+      imagen: fotoBase64 || ''
+    };
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar solicitud';
+        if (!res.ok) { mostrarErrores([res.error]); return; }
+        renderConfirmacion(res);
+      })
+      .withFailureHandler(function (err) {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar solicitud';
+        mostrarErrores([err && err.message ? err.message : 'Error inesperado al guardar.']);
+      })
+      .saveAsesoria(payload);
+  });
+
+  /* ---------- Pantalla de confirmación ---------- */
+  function renderConfirmacion(res) {
+    var mensajeInicial = construirMensajeWhatsapp(res);
+
+    document.getElementById('asesoriaWrap').innerHTML =
+      '<div class="form-card confirm-wrap">' +
+        '<div class="confirm-icon">✓</div>' +
+        '<h2>Asesoría registrada</h2>' +
+        '<p class="field-hint">Guarda este ID para dar seguimiento a la solicitud.</p>' +
+        '<div class="ticket-codigo" style="background:var(--color-accent-soft); color:var(--color-accent-dark); max-width:320px; margin:16px auto;">#' + res.idAsesoria + '</div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Cliente</span><span>'          + res.nombre      + '</span></div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Solicitud</span><span>'        + res.solicitud   + '</span></div>' +
+        '<div class="ticket-row" style="max-width:320px; margin:0 auto;"><span>Fecha de solicitud</span><span>' + res.fechaIngreso + '</span></div>' +
+
+        '<div class="field-group" style="max-width:320px; margin:18px auto 0;">' +
+          '<label for="ase_mensajeWhatsapp" style="text-align:left;">Mensaje para el cliente (editable)</label>' +
+          '<textarea id="ase_mensajeWhatsapp" style="min-height:130px;">' + mensajeInicial + '</textarea>' +
+        '</div>' +
+
+        '<div class="confirm-actions">' +
+          '<button class="btn btn-primary" style="background:#25D366; border-color:#25D366;" id="ase_btnEnviarWhatsapp" type="button">\u{1F4F2} Enviar por WhatsApp</button>' +
+          '<button class="btn btn-primary" onclick="loadPage(\'asesoriaForm\')">Registrar otra asesoría</button>' +
+          '<button class="btn btn-secondary" onclick="loadPage(\'asesorias\')">Volver al listado</button>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('ase_btnEnviarWhatsapp').addEventListener('click', function () {
+      var texto = document.getElementById('ase_mensajeWhatsapp').value.trim();
+      var link  = waLink(ultimoCelular, texto);
+      if (!link) { alert('No hay un celular válido registrado para enviar el WhatsApp.'); return; }
+      window.open(link, '_blank');
+    });
+  }
+})();
+</script>

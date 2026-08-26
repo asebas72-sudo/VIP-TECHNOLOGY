@@ -1,0 +1,9 @@
+# Config del Supabase CLI. Se completa al correr `supabase init` / `supabase link`
+# contra tu proyecto real (Supabase Dashboard → Project Settings → Reference ID).
+project_id = "vip-technology"
+
+[functions.send-ingreso-email]
+verify_jwt = true
+
+[functions.send-asesoria-email]
+verify_jwt = true

@@ -1,0 +1,1271 @@
+<style>
+  .app-shell { 
+    max-width: 100% !important; 
+    padding: 20px 24px 60px !important; 
+  }
+
+  #repWrap {
+    --sys-white: #ffffff !important;
+    --sys-gray-50: #f8fafc !important;
+    --sys-gray-100: #f1f5f9 !important;
+    --sys-gray-200: #e2e8f0 !important;
+    --sys-gray-300: #cbd5e1 !important;
+    --sys-gray-700: #475569 !important;
+    --sys-gray-900: #0f172a !important;
+    --sys-purple-600: #7e22ce !important;
+    --sys-purple-700: #6b21a8 !important;
+    --sys-emerald-600: #059669 !important;
+    --sys-amber-600: #d97706 !important;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100% !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    color: var(--sys-gray-900) !important;
+    box-sizing: border-box;
+  }
+  #repWrap *, #repWrap *::before, #repWrap *::after { box-sizing: border-box; }
+
+  .sys-header-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0 5px 0 !important;
+    border-bottom: 1px solid var(--sys-gray-200) !important;
+    margin-bottom: 10px;
+  }
+  .sys-header-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: var(--sys-purple-600) !important;
+    color: var(--sys-white) !important;
+    border-radius: 8px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .sys-header-text h1 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    color: var(--sys-gray-900) !important;
+  }
+  .sys-header-text p {
+    font-size: 13px !important;
+    color: var(--sys-gray-700) !important;
+    margin: 2px 0 0 0 !important;
+  }
+
+  .kpi-banner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100% !important;
+  }
+  @media (max-width: 768px) { .kpi-banner { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-card {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-200) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    min-width: 0;
+  }
+  .kpi-label { font-size: 11px !important; font-weight: 600 !important; text-transform: uppercase !important; color: var(--sys-gray-700) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-value { font-size: 28px !important; font-weight: 700 !important; line-height: 1 !important; }
+  .kpi-card.kpi-total { border-left: 4px solid var(--sys-gray-700) !important; }
+  .kpi-card.kpi-proceso { border-left: 4px solid var(--sys-amber-600) !important; }
+  .kpi-card.kpi-revisado { border-left: 4px solid var(--sys-purple-600) !important; }
+  .kpi-card.kpi-listo { border-left: 4px solid var(--sys-emerald-600) !important; }
+
+  .control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-200) !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .controls-left-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1 1 320px; min-width: 0; }
+  .controls-right-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .sys-input-search {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 6px !important;
+    padding: 0 12px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+    width: 220px !important;
+    outline: none !important;
+    flex: 1 1 180px; min-width: 140px;
+  }
+  .sys-select {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 6px !important;
+    padding: 0 10px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    flex: 1 1 220px; min-width: 180px;
+  }
+
+  .sys-btn {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    gap: 6px !important; height: 36px !important; padding: 0 14px !important; border-radius: 6px !important;
+    font-size: 13px !important; font-weight: 600 !important; border: 1px solid var(--sys-gray-300) !important;
+    background: var(--sys-white) !important; color: var(--sys-gray-700) !important; cursor: pointer !important;
+  }
+  .sys-btn-primary { background: var(--sys-purple-600) !important; color: var(--sys-white) !important; border: none !important; }
+  .sys-btn-primary:disabled { background: var(--sys-gray-300) !important; cursor: not-allowed !important; }
+  .sys-btn-wa { background: #14893c !important; color: var(--sys-white) !important; border: none !important; }
+  .sys-btn-wa:disabled { background: var(--sys-gray-300) !important; color: var(--sys-gray-700) !important; cursor: not-allowed !important; }
+  .sys-btn-mail { background: #2563eb !important; color: var(--sys-white) !important; border: none !important; }
+  .sys-btn-mail:disabled { background: var(--sys-gray-300) !important; color: var(--sys-gray-700) !important; cursor: not-allowed !important; }
+
+  .matrix-container {
+    background: var(--sys-white) !important;
+    border: 1px solid var(--sys-gray-300) !important;
+    border-radius: 8px !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+  }
+  .matrix-table { width: 100% !important; border-collapse: collapse !important; font-size: 13px !important; text-align: left !important; }
+  .matrix-table th {
+    background: var(--sys-gray-50) !important; padding: 12px 14px !important; font-weight: 600 !important; font-size: 11px !important;
+    text-transform: uppercase !important; color: var(--sys-gray-700) !important; border-bottom: 2px solid var(--sys-gray-300) !important;
+    border-right: 1px solid var(--sys-gray-200) !important; letter-spacing: 0.03em !important;
+  }
+  .matrix-table td { padding: 12px 14px !important; background: var(--sys-white) !important; border-bottom: 1px solid var(--sys-gray-200) !important; border-right: 1px solid var(--sys-gray-200) !important; }
+  .matrix-table tbody tr { cursor: pointer; transition: background 0.15s ease; }
+  .matrix-table tbody tr:hover { background: var(--sys-gray-50) !important; }
+
+  .status-pill { display: inline-flex !important; align-items: center !important; font-size: 11px !important; font-weight: 700 !important; padding: 2px 8px !important; border-radius: 4px !important; text-transform: uppercase !important; }
+  .st-ingresado  { background: #e0f2fe !important; color: #0369a1 !important; }
+  .st-en-proceso { background: #fef3c7 !important; color: #b45309 !important; }
+  .st-espera-repuestos { background: #ffedd5 !important; color: #c2410c !important; }
+  .st-revisado   { background: #f3e8ff !important; color: #7e22ce !important; }
+  .st-listo      { background: #d1fae5 !important; color: #047857 !important; }
+  .st-entregado  { background: #e2e8f0 !important; color: #475569 !important; text-decoration: line-through; }
+
+  .matrix-footer { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 12px 14px !important; font-size: 12px !important; background: var(--sys-gray-50) !important; border-top: 1px solid var(--sys-gray-300) !important; }
+  .img-preview-cell { width: 42px; height: 42px; border-radius: 4px; object-fit: cover; border: 1px solid var(--sys-gray-200); }
+  .wa-link-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 8px;
+    background: #e9fbf3 !important; border: 1px solid #bdf2da !important; color: #14893c !important;
+    font-size: 16px; text-decoration: none; transition: transform 0.1s ease, background 0.15s ease;
+  }
+  .wa-link-btn:hover { background: #d3f7e7 !important; transform: scale(1.06); }
+  .wa-link-disabled {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--sys-gray-100) !important; border: 1px solid var(--sys-gray-200) !important; color: var(--sys-gray-300) !important;
+    font-size: 16px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; 
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(5px);
+    display: none; align-items: center; justify-content: center; 
+    z-index: 9999; padding: 20px; box-sizing: border-box;
+  }
+  .modal-card {
+    background: #ffffff !important;
+    border-radius: 12px !important; width: 100%; max-width: 700px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2), 0 10px 10px -5px rgba(0,0,0,0.1) !important; 
+    display: flex; flex-direction: column;
+    max-height: 90vh; 
+    animation: modalSlide 0.2s ease-out; 
+    border: 1px solid var(--sys-gray-300) !important;
+  }
+  @keyframes modalSlide { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--sys-gray-200); display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .modal-header-titles h3 { margin: 0; font-size: 16px; }
+  .modal-header-sub { margin: 3px 0 0 0 !important; font-size: 12px !important; color: var(--sys-gray-700) !important; }
+  .modal-title-ticket { font-family: monospace; background: var(--sys-gray-100); padding: 2px 8px; border-radius: 4px; font-weight: 700; color: var(--sys-purple-600); }
+  .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: var(--sys-gray-50) !important; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--sys-gray-200); display: flex; justify-content: flex-end; gap: 10px; background: var(--sys-gray-50); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;}
+  .modal-close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--sys-gray-700); flex-shrink: 0; }
+
+  .section-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--sys-gray-700);
+  }
+  .section-label.is-editable { color: var(--sys-purple-600); }
+  .section-icon {
+    width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
+    background: var(--sys-gray-100); color: var(--sys-gray-700);
+  }
+  .section-label.is-editable .section-icon { background: #f3e8ff; color: var(--sys-purple-600); }
+  .modal-header-titles h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .section-label.with-tag { justify-content: space-between; }
+  .readonly-tag {
+    font-size: 10px !important; font-weight: 600 !important; text-transform: none !important; letter-spacing: 0 !important;
+    color: var(--sys-gray-700) !important; background: var(--sys-gray-100) !important; border: 1px solid var(--sys-gray-200) !important;
+    padding: 2px 8px !important; border-radius: 999px !important;
+  }
+
+  .recep-table-wrap {
+    margin-top: 8px; border: 1px solid var(--sys-gray-300); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.07); background: var(--sys-white);
+  }
+  .recep-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+  .recep-table th, .recep-table td { padding: 11px 14px; border-bottom: 1px solid var(--sys-gray-200); vertical-align: top; text-align: left; }
+  .recep-table tr:last-child th, .recep-table tr:last-child td { border-bottom: none; }
+  .recep-table th {
+    width: 130px; background: #eef1f6; border-right: 1px solid var(--sys-gray-300);
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--sys-gray-700);
+  }
+  .recep-table td { background: var(--sys-white); color: var(--sys-gray-900); font-weight: 600; font-size: 13.5px; word-break: break-word; }
+  .recep-table td.is-empty { color: #94a3b8; font-style: italic; font-weight: 400; }
+  .recep-row-alert th { background: #fde2e2; color: #b91c1c; }
+  .recep-row-alert td { background: #fff5f5; color: #b91c1c; font-weight: 700; }
+  .recep-row-alert td.is-empty { background: var(--sys-white); color: #94a3b8; font-weight: 400; }
+
+  #formFichaTecnica { display: flex; flex-direction: column; gap: 18px; }
+  .form-section {
+    display: flex; flex-direction: column; gap: 10px;
+    background: var(--sys-white) !important; border: 1px solid var(--sys-gray-200) !important; border-radius: 10px !important;
+    padding: 14px 16px !important; box-shadow: 0 1px 2px rgba(15,23,42,0.04) !important;
+  }
+  .form-section:last-child { padding-bottom: 14px; }
+  .form-section-hint { font-size: 12px; color: var(--sys-gray-700); margin-top: -4px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; font-weight: 600; color: var(--sys-gray-900); }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-input { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--sys-gray-300); border-radius: 6px; font-size: 13px; outline: none; box-sizing: border-box; }
+  .modal-textarea { width: 100%; height: 64px; padding: 8px 10px; border: 1px solid var(--sys-gray-300); border-radius: 6px; font-size: 13px; outline: none; resize: vertical; box-sizing: border-box; font-family: inherit; }
+  .modal-input:focus, .modal-textarea:focus { border-color: var(--sys-purple-600); }
+
+  .estado-select { font-weight: 700 !important; }
+  .estado-color-INGRESADO  { background: #e0f2fe !important; color: #0369a1 !important; border-color: #bae6fd !important; }
+  .estado-color-EN-PROCESO { background: #fef3c7 !important; color: #b45309 !important; border-color: #fde68a !important; }
+  .estado-color-ESPERA-REPUESTOS { background: #ffedd5 !important; color: #c2410c !important; border-color: #fed7aa !important; }
+  .estado-color-REVISADO   { background: #f3e8ff !important; color: #7e22ce !important; border-color: #e9d5ff !important; }
+  .estado-color-LISTO      { background: #d1fae5 !important; color: #047857 !important; border-color: #a7f3d0 !important; }
+  .estado-color-ENTREGADO  { background: #e2e8f0 !important; color: #475569 !important; border-color: #cbd5e1 !important; }
+
+  .comment-block { background: var(--sys-gray-50); border: 1px solid var(--sys-gray-200); border-radius: 6px; padding: 10px; }
+  .comment-block + .comment-block { margin-top: 10px; }
+  .comment-block-label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--sys-gray-700); margin-bottom: 6px; }
+  .comment-badge { width: 16px; height: 16px; border-radius: 50%; background: var(--sys-purple-600); color: var(--sys-white); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .comment-block .modal-textarea { height: 56px; background: var(--sys-white); }
+
+  /* ── FOTOS ── */
+  .foto-input-label {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    border: 2px dashed var(--sys-gray-300); border-radius: 8px;
+    padding: 16px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    font-size: 13px; color: var(--sys-gray-700); font-weight: 600;
+  }
+  .foto-input-label:hover { border-color: var(--sys-purple-600); background: #faf5ff; color: var(--sys-purple-600); }
+  #mdFotoInput { display: none; }
+
+  .foto-thumb-wrap { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .foto-thumb {
+    position: relative; width: 90px; height: 90px;
+    border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--sys-gray-200);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+  .foto-thumb img {
+    width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .foto-thumb img:hover { transform: scale(1.04); }
+  .foto-thumb-delete {
+    position: absolute; top: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(185,28,28,0.85); color: #fff;
+    border: none; cursor: pointer; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .foto-thumb-delete:hover { background: #b91c1c; }
+  .foto-thumb-badge {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(15,23,42,0.55); color: #fff;
+    font-size: 10px; font-weight: 600; text-align: center;
+    padding: 2px 0; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .foto-count-label { font-size: 11px; color: var(--sys-gray-700); margin-top: 6px; }
+
+  /* Lightbox */
+  #lightboxOverlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15,23,42,0.85); z-index: 99999;
+    display: none; align-items: center; justify-content: center;
+  }
+  #lightboxOverlay img { max-width: 90vw; max-height: 86vh; border-radius: 8px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+  #lightboxClose {
+    position: absolute; top: 18px; right: 22px;
+    color: #fff; font-size: 30px; cursor: pointer; font-weight: 700;
+    background: none; border: none; line-height: 1;
+  }
+
+  /* Modal envio cliente */
+  .send-summary-box {
+    background: var(--sys-white); border: 1px solid var(--sys-gray-300); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px;
+  }
+  .send-summary-row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--sys-gray-200); }
+  .send-summary-row:last-child { border-bottom: none; }
+  .send-summary-label { font-weight: 700; color: var(--sys-purple-600); min-width: 130px; flex-shrink: 0; }
+  .send-channel-status { font-size: 11px; color: var(--sys-gray-700); margin-top: 6px; }
+  .send-channel-status.ok { color: #047857; font-weight: 600; }
+  .send-channel-status.err { color: #b91c1c; font-weight: 600; }
+
+  /* ══════════════ RESPONSIVE ══════════════ */
+  @media (max-width: 768px) {
+    .app-shell { padding: 14px 12px 40px !important; }
+    .sys-header-icon { width: 38px; height: 38px; font-size: 18px; }
+    .sys-header-text h1 { font-size: 19px !important; }
+    .kpi-card { padding: 12px !important; }
+    .kpi-value { font-size: 22px !important; }
+
+    .control-bar { padding: 10px !important; }
+    .controls-left-group { flex: 1 1 100% !important; width: 100% !important; }
+    .controls-right-group { width: 100% !important; }
+    .controls-right-group .sys-btn { flex: 1 1 auto !important; }
+    .sys-input-search { width: 100% !important; flex: 1 1 100% !important; }
+    .sys-select { width: 100% !important; flex: 1 1 100% !important; }
+
+    /* Tabla principal → tarjetas apiladas (nada de columnas apretadas) */
+    .matrix-container { overflow-x: visible !important; padding: 10px !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+    .matrix-table { min-width: 0 !important; table-layout: auto !important; border-collapse: separate !important; border-spacing: 0 10px !important; }
+    .matrix-table thead { display: none !important; }
+    .matrix-table tbody, .matrix-table tr, .matrix-table td { display: block !important; width: 100% !important; }
+    .matrix-table tr {
+      background: var(--sys-white) !important;
+      border: 1px solid var(--sys-gray-200) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+      overflow: hidden;
+    }
+    .matrix-table tbody tr:hover { background: var(--sys-white) !important; }
+    .matrix-table td {
+      border: none !important;
+      border-bottom: 1px solid var(--sys-gray-100) !important;
+      padding: 9px 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 12px;
+      text-align: right !important;
+      white-space: normal !important;
+      max-width: none !important;
+    }
+    .matrix-table td:last-child { border-bottom: none !important; }
+    .matrix-table td::before {
+      content: attr(data-label);
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.03em;
+      color: var(--sys-gray-700) !important;
+      flex-shrink: 0;
+      text-align: left !important;
+    }
+    .matrix-table td.td-wa-cell {
+      justify-content: flex-end !important;
+      background: var(--sys-gray-50) !important;
+    }
+    .matrix-table td.td-wa-cell::before { content: none !important; }
+
+    .matrix-footer { flex-wrap: wrap !important; justify-content: center !important; text-align: center !important; gap: 8px !important; }
+
+    /* Modal */
+    .modal-overlay { padding: 8px !important; }
+    .modal-card { max-height: 94vh !important; }
+    .modal-header { padding: 12px 14px !important; }
+    .modal-body { padding: 14px !important; gap: 14px !important; }
+    .modal-footer { padding: 12px 14px !important; flex-wrap: wrap !important; }
+    .modal-footer > button { width: 100% !important; }
+    .modal-footer > div { width: 100% !important; display: flex !important; flex-direction: column !important; gap: 8px !important; }
+
+    .form-row-2 { grid-template-columns: 1fr !important; }
+
+    /* Tabla de datos de recepción → apilada */
+    .recep-table, .recep-table tbody, .recep-table tr, .recep-table th, .recep-table td {
+      display: block !important; width: 100% !important;
+    }
+    .recep-table th {
+      border-right: none !important; border-bottom: none !important;
+      padding: 10px 12px 2px 12px !important; font-size: 10px !important;
+    }
+    .recep-table td { padding: 2px 12px 10px 12px !important; }
+    .recep-table tr { border-bottom: 1px solid var(--sys-gray-200) !important; }
+    .recep-table tr:last-child { border-bottom: none !important; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-banner { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    .kpi-label { font-size: 10px !important; }
+    .kpi-value { font-size: 19px !important; }
+    .foto-thumb { width: 76px !important; height: 76px !important; }
+  }
+</style>
+
+<!-- Lightbox global -->
+<div id="lightboxOverlay" onclick="cerrarLightbox()">
+  <button id="lightboxClose" onclick="cerrarLightbox()">&times;</button>
+  <img id="lightboxImg" src="" alt="Vista ampliada">
+</div>
+
+<div id="repWrap">
+
+  <div class="sys-header-container">
+    <div class="sys-header-icon">🔧</div>
+    <div class="sys-header-text">
+      <h1>Panel de Reparaciones e Ingeniería</h1>
+    </div>
+  </div>
+
+  <div class="kpi-banner">
+    <div class="kpi-card kpi-total">
+      <span class="kpi-label">En Laboratorio</span>
+      <span class="kpi-value" id="repTotal">—</span>
+    </div>
+    <div class="kpi-card kpi-proceso">
+      <span class="kpi-label">En Proceso</span>
+      <span class="kpi-value" id="repProceso">—</span>
+    </div>
+    <div class="kpi-card kpi-revisado">
+      <span class="kpi-label">Revisados</span>
+      <span class="kpi-value" id="repRevisado">—</span>
+    </div>
+    <div class="kpi-card kpi-listo">
+      <span class="kpi-label">Listos para Entrega</span>
+      <span class="kpi-value" id="repListos">—</span>
+    </div>
+  </div>
+
+  <div class="control-bar">
+    <div class="controls-left-group">
+      <input type="text" id="repSearchInput" class="sys-input-search" placeholder="Buscar por cliente, ticket, equipo..." oninput="filtrarReparaciones()">
+      <select id="repStatusFilter" class="sys-select" onchange="filtrarPorEstadoRep(this.value)">
+        <option value="TALLER">🛠️ Todo en Laboratorio (No Entregado)</option>
+        <option value="INGRESADO">📥 Estado: Ingresado</option>
+        <option value="EN PROCESO">🔧 Estado: En Proceso</option>
+        <option value="ESPERA REPUESTOS">⏳ Estado: Espera Repuestos</option>
+        <option value="REVISADO">🔬 Estado: Revisado</option>
+        <option value="LISTO">✅ Estado: Listo</option>
+        <option value="ENTREGADO">📦 Historial: Entregado</option>
+      </select>
+    </div>
+    <div class="controls-right-group">
+      <button class="sys-btn" onclick="loadPage('menu')">Menu</button>
+    </div>
+  </div>
+
+  <div class="matrix-container">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="width: 56px; text-align: center;">WhatsApp</th>
+          <th style="width: 100px; cursor: pointer;" onclick="sortRepBy('FechaIngreso')">F. Ingreso ↑↓</th>
+          <th style="width: 130px; cursor: pointer;" onclick="sortRepBy('Codigo')">Ticket ↑↓</th>
+          <th style="cursor: pointer;" onclick="sortRepBy('Cliente')">Cliente ↑↓</th>
+          <th style="width: 160px;">Equipo</th>
+          <th style="width: 220px;">Fallas Reportadas</th>
+          <th style="width: 140px;">Técnico Asignado</th>
+          <th style="width: 110px; text-align: right;">Costo Rep.</th>
+          <th style="width: 140px; cursor: pointer;" onclick="sortRepBy('Estado')">Estado ↑↓</th>
+        </tr>
+      </thead>
+      <tbody id="repBodyTable">
+        <tr>
+          <td colspan="9" style="text-align: center; padding: 40px; color: var(--sys-gray-700);">
+            Abriendo canal con el módulo de reparaciones...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="matrix-footer">
+      <span id="repPagInfo">Calculando cola de ingeniería...</span>
+      <div style="display: flex; gap: 6px;">
+        <button class="sys-btn" id="repBtnPrev" onclick="cambiarPagRep(-1)" style="height:30px; padding:0 10px;">← Ant</button>
+        <button class="sys-btn" id="repBtnNext" onclick="cambiarPagRep(1)" style="height:30px; padding:0 10px;">Sig →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FICHA TÉCNICA -->
+<div id="modalReparacion" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-header-titles">
+        <h3>Ficha Técnica de Ingeniería <span id="mdTicket" class="modal-title-ticket">TK-0000</span></h3>
+        <p class="modal-header-sub" id="mdHeaderSub">—</p>
+      </div>
+      <button class="modal-close-btn" onclick="cerrarModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- DATOS DE RECEPCIÓN (solo lectura) -->
+      <div>
+        <div class="section-label with-tag">
+          <span style="display:flex; align-items:center; gap:8px;"><span class="section-icon">📌</span> Datos de Recepción</span>
+          <span class="readonly-tag">Solo lectura</span>
+        </div>
+        <div class="recep-table-wrap">
+          <table class="recep-table">
+            <tbody>
+              <tr>
+                <th>Cliente</th>
+                <td id="mdCliente">—</td>
+                <th>Celular</th>
+                <td id="mdCelular">—</td>
+              </tr>
+              <tr>
+                <th>Equipo inicial</th>
+                <td colspan="3" id="mdEquipo">—</td>
+              </tr>
+              <tr class="recep-row-alert">
+                <th>Fallas reportadas</th>
+                <td colspan="3" id="mdFallas">—</td>
+              </tr>
+              <tr>
+                <th>Observaciones</th>
+                <td colspan="3" id="mdObservacionesRec">—</td>
+              </tr>
+              <tr>
+                <th>Accesorios</th>
+                <td colspan="3" id="mdAccesorios">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <form id="formFichaTecnica">
+        <input type="hidden" id="mdHiddenCodigo">
+
+        <!-- SECCIÓN: ASIGNACIÓN Y ESTADO -->
+        <div class="form-section">
+          <div class="section-label is-editable"><span class="section-icon">🛠️</span> Asignación y Estado</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="mdTecnico">Técnico Asignado</label>
+              <input type="text" id="mdTecnico" class="modal-input" placeholder="Ej: Andres Alvarez">
+            </div>
+            <div class="form-group">
+              <label for="mdEstado">Estado Técnico</label>
+              <select id="mdEstado" class="modal-input estado-select" style="height:36px; padding:0 6px;" onchange="actualizarColorEstado()">
+                <option value="INGRESADO">📥 INGRESADO</option>
+                <option value="EN PROCESO">🔧 EN PROCESO</option>
+                <option value="ESPERA REPUESTOS">⏳ ESPERA REPUESTOS</option>
+                <option value="REVISADO">🔬 REVISADO</option>
+                <option value="LISTO">✅ LISTO PARA ENTREGA</option>
+                <option value="ENTREGADO">📦 ENTREGADO (Archivar)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="mdFechaRep">Fecha Diagnóstico / Reparación</label>
+              <input type="date" id="mdFechaRep" class="modal-input">
+            </div>
+            <div class="form-group">
+              <label for="mdCosto">Costo de la Reparación ($)</label>
+              <input type="text" inputmode="numeric" id="mdCosto" class="modal-input" placeholder="Ej: 85.000" oninput="formatearCampoCosto(this)">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN: FOTOS DEL EQUIPO (NUEVA) -->
+        <div class="form-section">
+          <div class="section-label is-editable"><span class="section-icon">📷</span> Fotos del Equipo</div>
+          <p class="form-section-hint">Adjunta fotos del estado del equipo (recepción, diagnóstico, reparación terminada). Máximo 5 fotos en total.</p>
+
+          <label class="foto-input-label" id="lblFotoInput" for="mdFotoInput">
+            <span style="font-size:20px;">📁</span>
+            Seleccionar fotos desde dispositivo
+          </label>
+          <input type="file" id="mdFotoInput" accept="image/*" multiple onchange="agregarFotosNuevas(this)">
+
+          <!-- Fotos ya guardadas en Drive -->
+          <div id="mdFotosGuardadasWrap" class="foto-thumb-wrap"></div>
+
+          <!-- Fotos nuevas recién seleccionadas (pendientes de guardar) -->
+          <div id="mdFotosNuevasWrap" class="foto-thumb-wrap"></div>
+
+          <p class="foto-count-label" id="mdFotoContador">0 foto(s) guardada(s) · 0 nueva(s) seleccionada(s)</p>
+        </div>
+
+        <!-- SECCIÓN: BITÁCORA -->
+        <div class="form-section">
+          <div class="section-label is-editable"><span class="section-icon">📝</span> Bitácora de Seguimiento del Técnico</div>
+          <p class="form-section-hint">Registra el avance mientras realizas el diagnóstico o la reparación.</p>
+          <div class="comment-block">
+            <div class="comment-block-label"><span class="comment-badge">1</span> Comentario 1</div>
+            <textarea id="mdComentario1" class="modal-textarea" placeholder="Ej: Se revisó la fuente de poder, pendiente prueba de carga..."></textarea>
+          </div>
+          <div class="comment-block">
+            <div class="comment-block-label"><span class="comment-badge">2</span> Comentario 2</div>
+            <textarea id="mdComentario2" class="modal-textarea" placeholder="Ej: Se reemplazó el disco duro, equipo en pruebas finales..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECCIÓN: INFORME FINAL -->
+        <div class="form-section">
+          <div class="section-label is-editable"><span class="section-icon">🔬</span> Informe Final de Laboratorio</div>
+          <div class="form-group">
+            <label for="mdObservacionFinal">Observación Final e Informe de Laboratorio</label>
+            <textarea id="mdObservacionFinal" class="modal-textarea" placeholder="Escribe el diagnóstico profundo, repuestos cambiados, etc..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="sys-btn" onclick="cerrarModal()">Cancelar / Volver</button>
+      <button class="sys-btn sys-btn-primary" id="btnGuardarFicha" onclick="guardarFichaTecnica()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTIFICACIÓN AL CLIENTE -->
+<div id="modalEnvioCliente" class="modal-overlay">
+  <div class="modal-card" style="max-width: 560px;">
+    <div class="modal-header">
+      <div class="modal-header-titles">
+        <h3>📨 Notificar al Cliente <span id="envTicket" class="modal-title-ticket">TK-0000</span></h3>
+        <p class="modal-header-sub" id="envHeaderSub">—</p>
+      </div>
+      <button class="modal-close-btn" onclick="cerrarModalEnvio()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-label"><span class="section-icon">✅</span> Cambios guardados en esta actualización</div>
+      <div class="send-summary-box" id="envResumenCambios">—</div>
+      <div class="form-section">
+        <div class="section-label is-editable"><span class="section-icon">✏️</span> Mensaje para el cliente</div>
+        <p class="form-section-hint">Puedes editar el texto antes de enviarlo.</p>
+        <textarea id="envMensaje" class="modal-textarea" style="height: 150px;"></textarea>
+      </div>
+      <div id="envEstadoEnvio" class="send-channel-status"></div>
+    </div>
+    <div class="modal-footer" style="justify-content: space-between;">
+      <button class="sys-btn" onclick="cerrarModalEnvio()">Omitir, no enviar</button>
+      <div style="display:flex; gap:10px;">
+        <button class="sys-btn sys-btn-mail" id="btnEnviarCorreo" onclick="enviarCorreoActualizacion()">✉️ Enviar por Correo</button>
+        <button class="sys-btn sys-btn-wa" id="btnEnviarWhatsapp" onclick="enviarWhatsappActualizacion()">🟢 Enviar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var todosRep = [], filtradosRep = [];
+  var paginaRep = 1, porPagRep = 12;
+  var sortColRep = 'Codigo', sortAscRep = true;
+  var estadoFiltroRep = 'TALLER';
+  var itemOriginalEdicion = null;
+  var itemActualEdicion = null;
+
+  // ── Fotos: estado interno ──
+  var fotosGuardadas = [];
+  var fotosNuevas = [];
+  var MAX_FOTOS = 5;
+
+  // ─────────────────────────────────────────────
+  // PRIORIDAD DE ESTADO (INGRESADO siempre primero, ENTREGADO al final)
+  // ─────────────────────────────────────────────
+  function prioridadEstadoRep(estado) {
+    var e = (estado || '').toUpperCase().trim();
+    if (e === 'ENTREGADO') return 2;
+    if (e === 'INGRESADO') return 0;
+    return 1;
+  }
+
+  // ─────────────────────────────────────────────
+  // PARSER DE IMÁGENES DRIVE / APP
+  // ─────────────────────────────────────────────
+  function convertirUrlImagen(url) {
+    if (!url || typeof url !== 'string') return '';
+    url = url.trim();
+    if (!url) return '';
+    
+    // Si ya es Base64
+    if (url.indexOf('data:image/') === 0) return url;
+
+    // Extracción de ID de Google Drive
+    var fileId = '';
+    var matchId = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || 
+                  url.match(/id=([a-zA-Z0-9_-]+)/) || 
+                  url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+                  
+    if (matchId && matchId[1]) {
+      fileId = matchId[1];
+    } else if (url.length > 25 && url.indexOf('/') === -1 && url.indexOf('.') === -1) {
+      fileId = url; // Es directamente un ID
+    }
+
+    if (fileId) {
+      return 'https://lh3.googleusercontent.com/d/' + fileId;
+    }
+
+    return url;
+  }
+
+  // ─────────────────────────────────────────────
+  // LIGHTBOX
+  // ─────────────────────────────────────────────
+  window.abrirLightbox = function(src) {
+    document.getElementById('lightboxImg').src = convertirUrlImagen(src);
+    document.getElementById('lightboxOverlay').style.display = 'flex';
+  };
+  window.cerrarLightbox = function() {
+    document.getElementById('lightboxOverlay').style.display = 'none';
+    document.getElementById('lightboxImg').src = '';
+  };
+
+  // ─────────────────────────────────────────────
+  // UTILIDADES GENERALES
+  // ─────────────────────────────────────────────
+  function badge(estado) {
+    var e = (estado || '').toUpperCase().trim();
+    var mapa = { 'INGRESADO': 'st-ingresado', 'EN PROCESO': 'st-en-proceso', 'ESPERA REPUESTOS': 'st-espera-repuestos', 'REVISADO': 'st-revisado', 'LISTO': 'st-listo', 'ENTREGADO': 'st-entregado' };
+    return '<span class="status-pill ' + (mapa[e] || 'st-ingresado') + '">' + (estado || '—') + '</span>';
+  }
+
+  window.formatearCampoCosto = function(input) {
+    var soloDigitos = input.value.replace(/\D/g, '');
+    input.value = soloDigitos ? Number(soloDigitos).toLocaleString('es-CO') : '';
+  };
+
+  function soloDigitosCosto(valorFormateado) {
+    return String(valorFormateado || '').replace(/\D/g, '');
+  }
+
+  function fmtMoneda(val) {
+    if (!val) return '—';
+    var num = parseFloat(String(val).replace(/[^\d.-]/g, ''));
+    if (isNaN(num)) return String(val);
+    return '$' + num.toLocaleString('es-CO', { minimumFractionDigits: 0 });
+  }
+
+  function waLink(celular, textoPrecargado) {
+    var digits = String(celular || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length === 10) digits = '57' + digits;
+    var url = 'https://wa.me/' + digits;
+    if (textoPrecargado) url += '?text=' + encodeURIComponent(textoPrecargado);
+    return url;
+  }
+
+  function setRecepCell(id, val) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (val && String(val).trim()) {
+      el.textContent = val;
+      el.classList.remove('is-empty');
+    } else {
+      el.textContent = 'No registrado';
+      el.classList.add('is-empty');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // CARGA Y FILTRADO
+  // ─────────────────────────────────────────────
+window.cargarReparaciones = function () {
+  var token = sessionStorage.getItem('vip_token');
+  if (!token) {
+    document.getElementById('repBodyTable').innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:40px;color:#b91c1c;">Sesión no encontrada. Vuelve a iniciar sesión.</td></tr>';
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function (data) {
+      todosRep = data || [];
+      metricasRep();
+      filtrarReparaciones();
+    })
+    .withFailureHandler(function (err) {
+      document.getElementById('repBodyTable').innerHTML =
+        '<tr><td colspan="9" style="text-align:center;padding:40px;color:#b91c1c;">' +
+        (err && err.message ? err.message : 'Error al cargar las reparaciones.') +
+        '</td></tr>';
+    })
+    .getReparacionesBackend(token);
+};
+
+  window.filtrarPorEstadoRep = function(val) {
+    estadoFiltroRep = val;
+    paginaRep = 1;
+    filtrarReparaciones();
+  };
+
+  window.filtrarReparaciones = function () {
+    var q = (document.getElementById('repSearchInput').value || '').toLowerCase().trim();
+    filtradosRep = todosRep.filter(function(r) {
+      var cumpleBusqueda = !q || ['Cliente','Codigo','Equipo','TecnicoAsignado','Fallas'].some(function(k){
+        return String(r[k]||'').toLowerCase().indexOf(q) > -1;
+      });
+      var cumpleEstado = true;
+      var est = (r.Estado || '').toUpperCase().trim();
+      if (estadoFiltroRep !== 'TALLER') {
+        cumpleEstado = (est === estadoFiltroRep);
+      }
+      return cumpleBusqueda && cumpleEstado;
+    });
+
+    filtradosRep.sort(function(a, b) {
+      var pa = prioridadEstadoRep(a.Estado);
+      var pb = prioridadEstadoRep(b.Estado);
+      if (pa !== pb) return pa - pb;
+      return sortAscRep
+        ? String(a[sortColRep]).localeCompare(String(b[sortColRep]))
+        : String(b[sortColRep]).localeCompare(String(a[sortColRep]));
+    });
+    renderTablaRep();
+  };
+
+  window.sortRepBy = function(col) {
+    sortAscRep = sortColRep === col ? !sortAscRep : true;
+    sortColRep = col;
+    filtrarReparaciones();
+  };
+
+  function renderTablaRep() {
+    var tbody = document.getElementById('repBodyTable');
+    var total = filtradosRep.length;
+    var inicio = (paginaRep - 1) * porPagRep;
+    var fin = Math.min(inicio + porPagRep, total);
+    var slice = filtradosRep.slice(inicio, fin);
+
+    document.getElementById('repPagInfo').textContent = total === 0
+      ? 'Sin órdenes pendientes'
+      : 'Órdenes ' + (inicio+1) + ' al ' + fin + ' de ' + total;
+    document.getElementById('repBtnPrev').disabled = paginaRep <= 1;
+    document.getElementById('repBtnNext').disabled = fin >= total;
+
+    if (!slice.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--sys-gray-700);">No hay equipos en este bloque de laboratorio.</td></tr>';
+      return;
+    }
+
+    var html = '';
+    slice.forEach(function(r) {
+      var fechaIngresoTag = r.FechaIngreso ? r.FechaIngreso : '—';
+
+      var wa = waLink(r.Celular);
+      var waTag = wa
+        ? '<a href="' + wa + '" target="_blank" rel="noopener" class="wa-link-btn" title="Escribir por WhatsApp" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20" fill="currentColor" style="vertical-align:middle;"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg></a>'
+        : '<span class="wa-link-disabled" title="Sin celular registrado" style="opacity:0.5;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20" fill="currentColor" style="vertical-align:middle;"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg></span>';
+
+      html += '<tr onclick="abrirFichaTecnica(\'' + r.Codigo + '\')">' +
+        '<td data-label="" class="td-wa-cell" style="text-align:center; padding:6px 14px;">' + waTag + '</td>' +
+        '<td data-label="F. Ingreso" style="text-align:center; font-size:12.5px; color:var(--sys-gray-700);">' + fechaIngresoTag + '</td>' +
+        '<td data-label="Ticket" style="font-family:monospace; font-size:12px; font-weight:600; color:var(--sys-purple-600);">' + (r.Codigo||'—') + '</td>' +
+        '<td data-label="Cliente"><b>' + (r.Cliente||'—') + '</b></td>' +
+        '<td data-label="Equipo">' + (r.Equipo||'—') + '</td>' +
+        '<td data-label="Fallas" style="white-space:normal !important; word-break:break-word;">' + (r.Fallas||'—') + '</td>' +
+        '<td data-label="Técnico">' + (r.TecnicoAsignado || '<span style="color:#94a3b8; font-style:italic;">Sin asignar</span>') + '</td>' +
+        '<td data-label="Costo" style="text-align:right; font-weight:600;">' + fmtMoneda(r.CostoReparacion) + '</td>' +
+        '<td data-label="Estado">' + badge(r.Estado) + '</td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  // ─────────────────────────────────────────────
+  // ESTADO DEL SELECTOR
+  // ─────────────────────────────────────────────
+  window.actualizarColorEstado = function() {
+    var sel = document.getElementById('mdEstado');
+    var clases = ['estado-color-INGRESADO','estado-color-EN-PROCESO','estado-color-ESPERA-REPUESTOS','estado-color-REVISADO','estado-color-LISTO','estado-color-ENTREGADO'];
+    clases.forEach(function(c){ sel.classList.remove(c); });
+    sel.classList.add('estado-color-' + sel.value.replace(/\s+/g, '-'));
+  };
+
+  // ─────────────────────────────────────────────
+  // MANEJO DE FOTOS
+  // ─────────────────────────────────────────────
+
+  function actualizarContadorFotos() {
+    var total = fotosGuardadas.length + fotosNuevas.length;
+    document.getElementById('mdFotoContador').textContent =
+      fotosGuardadas.length + ' foto(s) guardada(s) · ' + fotosNuevas.length + ' nueva(s) seleccionada(s)' +
+      (total >= MAX_FOTOS ? ' · ⚠️ Límite de ' + MAX_FOTOS + ' alcanzado' : '');
+  }
+
+  function renderThumbs(esEntregado) {
+    var gWrap = document.getElementById('mdFotosGuardadasWrap');
+    var nWrap = document.getElementById('mdFotosNuevasWrap');
+    gWrap.innerHTML = '';
+    nWrap.innerHTML = '';
+
+    fotosGuardadas.forEach(function(f, i) {
+      var div = document.createElement('div');
+      div.className = 'foto-thumb';
+      var btnDel = esEntregado ? '' : '<button type="button" class="foto-thumb-delete" onclick="eliminarFotoGuardada(' + i + ')" title="Eliminar foto">×</button>';
+      div.innerHTML =
+        '<img src="' + f.url + '" alt="Foto guardada ' + (i+1) + '" onclick="abrirLightbox(\'' + f.url + '\')">' +
+        '<span class="foto-thumb-badge">' + (f.label || ('Foto ' + (i+1))) + '</span>' + btnDel;
+      gWrap.appendChild(div);
+    });
+
+    fotosNuevas.forEach(function(f, i) {
+      var div = document.createElement('div');
+      div.className = 'foto-thumb';
+      var btnDel = esEntregado ? '' : '<button type="button" class="foto-thumb-delete" onclick="eliminarFotoNueva(' + i + ')" title="Quitar foto">×</button>';
+      div.innerHTML =
+        '<img src="' + f.dataUrl + '" alt="Nueva foto ' + (i+1) + '" onclick="abrirLightbox(\'' + f.dataUrl + '\')">' +
+        '<span class="foto-thumb-badge" style="background:rgba(126,34,206,0.75);">Nueva</span>' + btnDel;
+      nWrap.appendChild(div);
+    });
+
+    actualizarContadorFotos();
+  }
+
+  window.eliminarFotoGuardada = function(idx) {
+    fotosGuardadas.splice(idx, 1);
+    renderThumbs(false);
+  };
+
+  window.eliminarFotoNueva = function(idx) {
+    fotosNuevas.splice(idx, 1);
+    renderThumbs(false);
+  };
+
+  window.agregarFotosNuevas = function(input) {
+    var disponibles = MAX_FOTOS - fotosGuardadas.length - fotosNuevas.length;
+    if (disponibles <= 0) {
+      alert('Ya alcanzaste el límite de ' + MAX_FOTOS + ' fotos. Elimina alguna para agregar nuevas.');
+      input.value = '';
+      return;
+    }
+    var archivos = Array.from(input.files).slice(0, disponibles);
+    var promesas = archivos.map(function(file) {
+      return new Promise(function(resolve) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          resolve({ dataUrl: e.target.result, file: file });
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(promesas).then(function(resultados) {
+      fotosNuevas = fotosNuevas.concat(resultados);
+      renderThumbs(false);
+      input.value = '';
+    });
+  };
+
+  // ─────────────────────────────────────────────
+  // ABRIR MODAL
+  // ─────────────────────────────────────────────
+  window.abrirFichaTecnica = function(codigoTicket) {
+    var item = todosRep.filter(function(r) { return r.Codigo === codigoTicket; })[0];
+    if (!item) return;
+
+    itemActualEdicion = item;
+    itemOriginalEdicion = {
+      Estado: (item.Estado || 'INGRESADO').toUpperCase().trim(),
+      TecnicoAsignado: item.TecnicoAsignado || '',
+      CostoReparacion: item.CostoReparacion || '',
+      ObservacionFinal: item.ObservacionFinal || '',
+      Comentario1: item.Comentario1 || '',
+      Comentario2: item.Comentario2 || ''
+    };
+
+    document.getElementById('mdTicket').textContent = item.Codigo;
+    document.getElementById('mdHeaderSub').textContent = (item.Cliente || 'Cliente sin nombre') + '  ·  ' + (item.Equipo || 'Equipo sin especificar');
+    document.getElementById('mdHiddenCodigo').value = item.Codigo;
+    setRecepCell('mdCliente', item.Cliente);
+    setRecepCell('mdCelular', item.Celular);
+    setRecepCell('mdEquipo', item.Equipo);
+    setRecepCell('mdFallas', item.Fallas);
+    setRecepCell('mdObservacionesRec', item.Observaciones);
+    setRecepCell('mdAccesorios', item.Accesorios);
+
+    document.getElementById('mdTecnico').value = item.TecnicoAsignado || '';
+    document.getElementById('mdEstado').value = (item.Estado || 'INGRESADO').toUpperCase().trim();
+    actualizarColorEstado();
+    document.getElementById('mdCosto').value = item.CostoReparacion ? Number(String(item.CostoReparacion).replace(/\D/g,'')).toLocaleString('es-CO') : '';
+    document.getElementById('mdObservacionFinal').value = item.ObservacionFinal || '';
+    document.getElementById('mdComentario1').value = item.Comentario1 || '';
+    document.getElementById('mdComentario2').value = item.Comentario2 || '';
+
+    if (item.FechaReparacion && item.FechaReparacion.indexOf('/') > -1) {
+      var partes = item.FechaReparacion.split('/');
+      document.getElementById('mdFechaRep').value = partes[2] + '-' + partes[1] + '-' + partes[0];
+    } else {
+      document.getElementById('mdFechaRep').value = new Date().toISOString().substring(0, 10);
+    }
+
+    // ── Cargar fotos guardadas ──
+    fotosNuevas = [];
+    fotosGuardadas = [];
+    var campos = ['Foto1','Foto2','Foto3','Foto4','Foto5'];
+    campos.forEach(function(c, i) {
+      if (item[c] && String(item[c]).trim()) {
+        fotosGuardadas.push({ url: convertirUrlImagen(item[c]), label: 'Foto ' + (i+1) });
+      }
+    });
+    if (fotosGuardadas.length === 0 && item.Imagen && String(item.Imagen).trim()) {
+      fotosGuardadas.push({ url: convertirUrlImagen(item.Imagen), label: 'Foto original' });
+    }
+
+    // ── BLOQUEO SI EL ESTADO ES ENTREGADO ──
+    var esEntregado = (item.Estado || '').toUpperCase().trim() === 'ENTREGADO';
+    
+    var inputsForm = document.querySelectorAll('#formFichaTecnica input, #formFichaTecnica select, #formFichaTecnica textarea');
+    inputsForm.forEach(function(el) {
+      el.disabled = esEntregado;
+    });
+
+    var lblFoto = document.getElementById('lblFotoInput');
+    var btnGuardar = document.getElementById('btnGuardarFicha');
+
+    if (esEntregado) {
+      lblFoto.style.pointerEvents = 'none';
+      lblFoto.style.opacity = '0.5';
+      btnGuardar.style.display = 'none';
+    } else {
+      lblFoto.style.pointerEvents = 'auto';
+      lblFoto.style.opacity = '1';
+      btnGuardar.style.display = 'inline-flex';
+    }
+
+    renderThumbs(esEntregado);
+
+    document.getElementById('modalReparacion').style.display = 'flex';
+  };
+
+  window.cerrarModal = function() {
+    document.getElementById('modalReparacion').style.display = 'none';
+  };
+
+  // ─────────────────────────────────────────────
+  // GUARDAR
+  // ─────────────────────────────────────────────
+  function detectarCambios(payload) {
+    var etiquetas = {
+      Estado: 'Estado',
+      TecnicoAsignado: 'Técnico asignado',
+      CostoReparacion: 'Costo de reparación',
+      ObservacionFinal: 'Observación final / Informe',
+      Comentario1: 'Comentario 1',
+      Comentario2: 'Comentario 2'
+    };
+    var nuevos = {
+      Estado: payload.estado,
+      TecnicoAsignado: payload.tecnico,
+      CostoReparacion: payload.costo,
+      ObservacionFinal: payload.observacionFinal,
+      Comentario1: payload.comentario1,
+      Comentario2: payload.comentario2
+    };
+    var cambios = [];
+    Object.keys(etiquetas).forEach(function(k) {
+      var antes = String(itemOriginalEdicion[k] || '').trim();
+      var ahora = String(nuevos[k] || '').trim();
+      if (antes !== ahora && ahora !== '') {
+        cambios.push({ campo: etiquetas[k], antes: antes, ahora: ahora, esNuevo: antes === '' });
+      }
+    });
+    return cambios;
+  }
+
+  function ejecutarGuardado(payload, cambiosDetectados) {
+    var btn = document.getElementById('btnGuardarFicha');
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Guardar Cambios';
+        if (res.ok) {
+          cerrarModal();
+          cargarReparaciones();
+          if (cambiosDetectados.length > 0 && itemActualEdicion) {
+            abrirModalEnvio(itemActualEdicion, cambiosDetectados);
+          }
+        } else {
+          alert('Error al guardar: ' + res.error);
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Guardar Cambios';
+        alert('Error crítico de red: ' + (err ? err.message : 'Desconocido'));
+      })
+      .updateReparacionBackend(payload);
+  }
+
+window.guardarFichaTecnica = function () {
+  var token = sessionStorage.getItem('vip_token');
+  if (!token) {
+    alert('Sesión no encontrada. Vuelve a iniciar sesión.');
+    return;
+  }
+
+  var btn = document.getElementById('btnGuardarFicha');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  var payload = {
+    token: token,
+    codigo: document.getElementById('mdHiddenCodigo').value,
+    tecnico: document.getElementById('mdTecnico').value.trim(),
+    estado: document.getElementById('mdEstado').value,
+    costo: soloDigitosCosto(document.getElementById('mdCosto').value),
+    observacionFinal: document.getElementById('mdObservacionFinal').value.trim(),
+    comentario1: document.getElementById('mdComentario1').value.trim(),
+    comentario2: document.getElementById('mdComentario2').value.trim(),
+    fechaRep: document.getElementById('mdFechaRep').value,
+    fotosExistentes: fotosGuardadas.map(function (f) { return f.url; }),
+    fotosNuevasBase64: fotosNuevas.map(function (f) { return f.dataUrl; })
+  };
+
+  var cambiosDetectados = detectarCambios(payload);
+
+  if (fotosNuevas.length > 0) {
+    btn.textContent = 'Subiendo fotos (' + fotosNuevas.length + ')...';
+  }
+
+  ejecutarGuardado(payload, cambiosDetectados);
+};
+  // ─────────────────────────────────────────────
+  // MODAL ENVÍO CLIENTE
+  // ─────────────────────────────────────────────
+  function construirMensajeCliente(item, cambios) {
+    var esListo = cambios.some(function(c) {
+      return c.campo === 'Estado' && String(c.ahora || '').toUpperCase().trim() === 'LISTO';
+    });
+
+    var lineas = [];
+    lineas.push('Hola ' + (item.Cliente || '') + ', le escribimos de VIP TECHNOLOGY con una actualización sobre su equipo "' + (item.Equipo || '') + '" (Ticket ' + item.Codigo + ').');
+    lineas.push('');
+    cambios.forEach(function(c) {
+      if (c.campo === 'Estado') {
+        lineas.push('• Estado actual: ' + c.ahora);
+      } else if (c.campo === 'Costo de reparación') {
+        lineas.push('• Costo estimado de la reparación: $' + Number(c.ahora).toLocaleString('es-CO'));
+      } else {
+        lineas.push('• ' + c.campo + ': ' + c.ahora);
+      }
+    });
+    lineas.push('');
+
+    if (esListo) {
+      lineas.push('Su equipo ya esta disponible para ser recogido, puede pasar por él preferiblemente los dias LUNES - MIERCOLES - VIERNES de 3 de la tarde a 7 de la noche, Agradecemos su retiro dentro de los próximos 15 días hábiles, ya que posterior a esta fecha VIP TECHNOLOGY no podrá responder por la custodia del mismo. ¡Quedamos atentos a tu visita!.');
+      lineas.push('');
+      lineas.push('Gracias por la confianza');
+    } else {
+      lineas.push('Quedamos al pendiente de su aprobacion,cualquier duda, con gusto le atendemos. ¡Gracias por su confianza!');
+    }
+
+    return lineas.join('\n');
+  }
+
+  window.abrirModalEnvio = function(item, cambios) {
+    document.getElementById('envTicket').textContent = item.Codigo;
+    document.getElementById('envHeaderSub').textContent = (item.Cliente || 'Cliente sin nombre') + '  ·  ' + (item.Equipo || '');
+
+    var resumenHtml = cambios.map(function(c) {
+      return '<div class="send-summary-row"><span class="send-summary-label">' + c.campo + '</span><span>' +
+        (c.campo === 'Costo de reparación' ? '$' + Number(c.ahora).toLocaleString('es-CO') : c.ahora) +
+        '</span></div>';
+    }).join('');
+    document.getElementById('envResumenCambios').innerHTML = resumenHtml;
+    document.getElementById('envMensaje').value = construirMensajeCliente(item, cambios);
+    document.getElementById('envEstadoEnvio').textContent = '';
+    document.getElementById('envEstadoEnvio').className = 'send-channel-status';
+
+    var btnWA = document.getElementById('btnEnviarWhatsapp');
+    var btnMail = document.getElementById('btnEnviarCorreo');
+    btnWA.disabled = !item.Celular;
+    btnWA.title = item.Celular ? '' : 'Este cliente no tiene celular registrado';
+    btnMail.disabled = !item.Correo;
+    btnMail.title = item.Correo ? '' : 'Este cliente no tiene correo registrado';
+
+    document.getElementById('modalEnvioCliente').style.display = 'flex';
+  };
+
+  window.cerrarModalEnvio = function() {
+    document.getElementById('modalEnvioCliente').style.display = 'none';
+  };
+
+  window.enviarWhatsappActualizacion = function() {
+    var item = itemActualEdicion;
+    var texto = document.getElementById('envMensaje').value;
+    var url = waLink(item.Celular, texto);
+    if (!url) { alert('Este cliente no tiene celular registrado.'); return; }
+    window.open(url, '_blank', 'noopener');
+  };
+
+  window.enviarCorreoActualizacion = function() {
+    var item = itemActualEdicion;
+    if (!item.Correo) { alert('Este cliente no tiene correo registrado.'); return; }
+    var btn = document.getElementById('btnEnviarCorreo');
+    var estadoEl = document.getElementById('envEstadoEnvio');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.textContent = '✉️ Enviar por Correo';
+        if (res && res.ok) {
+          estadoEl.textContent = '✅ Correo enviado a ' + item.Correo;
+          estadoEl.className = 'send-channel-status ok';
+        } else {
+          estadoEl.textContent = '❌ No se pudo enviar el correo: ' + (res ? res.error : 'desconocido');
+          estadoEl.className = 'send-channel-status err';
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.textContent = '✉️ Enviar por Correo';
+        estadoEl.textContent = '❌ Error de red: ' + (err ? err.message : 'desconocido');
+        estadoEl.className = 'send-channel-status err';
+      })
+      .enviarCorreoReparacionBackend({
+        destinatario: item.Correo,
+        asunto: 'Actualización de su reparación · Ticket ' + item.Codigo,
+        cuerpo: document.getElementById('envMensaje').value
+      });
+  };
+
+  // ─────────────────────────────────────────────
+  // PAGINACIÓN Y MÉTRICAS
+  // ─────────────────────────────────────────────
+  window.cambiarPagRep = function(dir) { paginaRep += dir; renderTablaRep(); };
+
+  function metricasRep() {
+    document.getElementById('repTotal').textContent    = todosRep.filter(function(r){ return (r.Estado||'').toUpperCase() !== 'ENTREGADO'; }).length;
+    document.getElementById('repProceso').textContent  = todosRep.filter(function(r){ return (r.Estado||'').toUpperCase() === 'EN PROCESO'; }).length;
+    document.getElementById('repRevisado').textContent = todosRep.filter(function(r){ return (r.Estado||'').toUpperCase() === 'REVISADO'; }).length;
+    document.getElementById('repListos').textContent   = todosRep.filter(function(r){ return (r.Estado||'').toUpperCase() === 'LISTO'; }).length;
+  }
+
+  cargarReparaciones();
+})();
+</script>

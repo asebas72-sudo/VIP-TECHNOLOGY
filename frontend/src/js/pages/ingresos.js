@@ -1,321 +1,356 @@
-import { obtenerMarcas, obtenerTiposEquipo } from '../data/catalogos.js';
-import { buscarClientePorCedula } from '../data/clientes.js';
-import { crearIngreso } from '../data/tickets.js';
+import { listarTickets, marcarTicketEntregado } from '../data/tickets.js';
 
-const inputCls =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent focus:outline-none';
-const labelCls = 'mb-1 block text-xs font-bold uppercase text-slate-500';
+const COLOR_ESTADO = {
+  INGRESADO: 'bg-sky-100 text-sky-700',
+  'EN PROCESO': 'bg-amber-100 text-amber-700',
+  'ESPERA REPUESTOS': 'bg-orange-100 text-orange-700',
+  REVISADO: 'bg-purple-100 text-purple-700',
+  LISTO: 'bg-green-100 text-green-700',
+  ENTREGADO: 'bg-indigo-100 text-indigo-700'
+};
+
+function badge(estado) {
+  const cls = COLOR_ESTADO[estado] || 'bg-slate-100 text-slate-600';
+  return `<span class="rounded px-2 py-0.5 text-[11px] font-bold uppercase ${cls}">${estado || '—'}</span>`;
+}
+
+function fmtFecha(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function fmtCosto(v) {
+  if (!v && v !== 0) return '—';
+  return '$ ' + Number(v).toLocaleString('es-CO');
+}
+
+function waIconLink(celular) {
+  const digits = String(celular || '').replace(/\D/g, '');
+  const icono = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12.004 2C6.48 2 2 6.48 2 12c0 1.908.533 3.69 1.454 5.215L2 22l4.93-1.39A9.957 9.957 0 0 0 12.004 22c5.523 0 10-4.48 10-10s-4.477-10-10-10zm0 1.5c4.694 0 8.5 3.806 8.5 8.5s-3.806 8.5-8.5 8.5c-1.636 0-3.155-.465-4.453-1.266l-.32-.2-.228.064-2.73.768.784-2.646-.07-.246A8.448 8.448 0 0 1 3.5 12c0-4.694 3.806-8.5 8.5-8.5z" fill="#25D366"/></svg>`;
+  if (!digits) return `<span class="inline-flex h-7 w-7 items-center justify-center opacity-30">${icono}</span>`;
+  const num = digits.length === 10 ? '57' + digits : digits;
+  return `<a href="https://wa.me/${num}" target="_blank" rel="noopener" title="Escribir por WhatsApp" onclick="event.stopPropagation()" class="inline-flex h-7 w-7 items-center justify-center transition hover:scale-110">${icono}</a>`;
+}
+
+const ESTADOS_FILTRO = [
+  ['TODOS', '📋 Todos los estados'],
+  ['INGRESADO', '📥 Ingresado'],
+  ['PROCESO', '🔧 En soporte'],
+  ['LISTO', '✅ Listo'],
+  ['ENTREGADO', '📦 Entregado']
+];
 
 export async function render(container, { navigate }) {
   container.innerHTML = `
-    <button class="mb-4 text-sm font-semibold text-accent" data-back>← Menú</button>
-    <h2 class="mb-4 text-xl font-bold text-slate-900">Registrar ingreso de equipo</h2>
-
-    <div id="ingreso-alert" class="mb-4 hidden rounded-md bg-red-50 p-3 text-sm text-red-700"></div>
-
-    <form id="ingreso-form" class="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
-      <div class="md:col-span-2">
-        <label class="${labelCls}" for="f-cedula">Cédula</label>
-        <input id="f-cedula" type="text" inputmode="numeric" class="${inputCls}" placeholder="Escribe la cédula para buscar cliente…" />
-        <span id="cedula-hint" class="mt-1 hidden text-xs text-slate-500"></span>
-      </div>
-
-      <div class="md:col-span-2">
-        <label class="${labelCls}" for="f-nombre">Nombre del cliente</label>
-        <input id="f-nombre" type="text" class="${inputCls}" placeholder="Ej: Laura Gómez" />
-      </div>
-
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <label class="${labelCls}" for="f-celular">Celular</label>
-        <input id="f-celular" type="tel" inputmode="numeric" class="${inputCls}" placeholder="Solo números" />
+        <button class="mb-1 block text-sm font-semibold text-accent" data-back>← Menú</button>
+        <h2 class="text-xl font-bold text-slate-900">Control de Ingresos</h2>
       </div>
-      <div>
-        <label class="${labelCls}" for="f-correo">Correo del cliente</label>
-        <input id="f-correo" type="email" class="${inputCls}" placeholder="correo@ejemplo.com" />
-      </div>
+      <button id="btn-nuevo" class="rounded-md bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-dark">+ Registrar equipo</button>
+    </div>
 
-      <div class="md:col-span-2">
-        <label class="${labelCls}" for="f-equipo">Equipo</label>
-        <input id="f-equipo" type="text" class="${inputCls}" placeholder="Ej: HP Pavilion 14" />
-      </div>
+    <div id="ing-metricas" class="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5"></div>
 
-      <div>
-        <label class="${labelCls}" for="f-tipo">Tipo de equipo</label>
-        <select id="f-tipo" class="${inputCls}"><option value="">Cargando…</option></select>
+    <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <input id="ing-busqueda" type="text" placeholder="Buscar por cliente, ticket…"
+             class="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm sm:min-w-[220px]" />
+      <select id="ing-filtro-estado" class="rounded-md border border-slate-300 px-3 py-2 text-sm">
+        ${ESTADOS_FILTRO.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}
+      </select>
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <span>Desde</span>
+        <input id="ing-desde" type="date" class="rounded-md border border-slate-300 px-2 py-2 text-sm" />
+        <span>Hasta</span>
+        <input id="ing-hasta" type="date" class="rounded-md border border-slate-300 px-2 py-2 text-sm" />
       </div>
-      <div>
-        <label class="${labelCls}" for="f-marca">Marca</label>
-        <select id="f-marca" class="${inputCls}"><option value="">Cargando…</option></select>
-      </div>
+    </div>
 
-      <div class="md:col-span-2">
-        <span class="${labelCls}">Accesorios que entrega el cliente</span>
-        <div class="flex flex-wrap gap-3">
-          ${['Cargador', 'Teclado', 'Mouse', 'Estuche']
-            .map(
-              (a) => `
-            <label class="flex items-center gap-1.5 rounded-full border border-slate-300 px-3 py-1 text-xs">
-              <input type="checkbox" class="accesorio" value="${a}"> ${a}
-            </label>`
-            )
-            .join('')}
+    <div id="ing-alert" class="mb-3 hidden rounded-md bg-red-50 p-3 text-sm text-red-700"></div>
+
+    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <table class="w-full min-w-[820px] text-left text-sm">
+        <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
+          <tr>
+            <th class="px-2 py-2 text-center">WA</th>
+            <th class="cursor-pointer px-3 py-2" data-sort="fecha_ingreso">Fecha ↑↓</th>
+            <th class="px-3 py-2">Código</th>
+            <th class="cursor-pointer px-3 py-2" data-sort="cliente">Cliente ↑↓</th>
+            <th class="px-3 py-2">Celular</th>
+            <th class="px-3 py-2">Equipo</th>
+            <th class="px-3 py-2">Técnico</th>
+            <th class="px-3 py-2">Falla</th>
+            <th class="px-3 py-2">Costo</th>
+            <th class="px-3 py-2">Obs. final</th>
+            <th class="cursor-pointer px-3 py-2" data-sort="estado">Estado ↑↓</th>
+          </tr>
+        </thead>
+        <tbody id="ing-tbody"></tbody>
+      </table>
+      <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+        <span id="ing-pag-info"></span>
+        <div class="flex gap-2">
+          <button id="ing-prev" class="rounded border border-slate-300 px-2 py-1">← Ant</button>
+          <button id="ing-next" class="rounded border border-slate-300 px-2 py-1">Sig →</button>
         </div>
       </div>
+    </div>
 
-      <div class="md:col-span-2">
-        <label class="${labelCls}" for="f-fallas">Fallas reportadas</label>
-        <textarea id="f-fallas" class="${inputCls}" rows="2" placeholder="¿Qué problema presenta el equipo?"></textarea>
-      </div>
-      <div class="md:col-span-2">
-        <label class="${labelCls}" for="f-observaciones">Observaciones</label>
-        <textarea id="f-observaciones" class="${inputCls}" rows="2" placeholder="Estado físico, detalles adicionales…"></textarea>
-      </div>
-
-      <div class="md:col-span-2">
-        <span class="${labelCls}">Foto del equipo</span>
-        <input id="f-foto" type="file" accept="image/*" capture="environment" class="text-sm" />
-        <img id="foto-preview" class="mt-2 hidden h-32 rounded-md border border-slate-200 object-cover" />
-      </div>
-
-      <div class="md:col-span-2">
-        <span class="${labelCls}">Firma del cliente</span>
-        <canvas id="firma-canvas" class="h-40 w-full rounded-md border border-slate-300 bg-white"></canvas>
-        <button type="button" id="btn-limpiar-firma" class="mt-2 rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600">
-          Borrar firma
-        </button>
-      </div>
-
-      <button type="submit" id="btn-guardar" class="md:col-span-2 rounded-md bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-dark">
-        Guardar ingreso
-      </button>
-    </form>
-
-    <div id="confirmacion" class="hidden"></div>
-  `;
-
-  container.querySelector('[data-back]').addEventListener('click', () => navigate('menu'));
-
-  // ---------- Catálogos ----------
-  const selTipo = container.querySelector('#f-tipo');
-  const selMarca = container.querySelector('#f-marca');
-  try {
-    const [tipos, marcas] = await Promise.all([obtenerTiposEquipo(), obtenerMarcas()]);
-    selTipo.innerHTML =
-      '<option value="">Selecciona…</option>' +
-      tipos.map((t) => `<option value="${t.id}">${t.nombre}</option>`).join('');
-    selMarca.innerHTML =
-      '<option value="">Selecciona…</option>' +
-      marcas.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join('');
-  } catch (err) {
-    selTipo.innerHTML = '<option value="">Error al cargar</option>';
-    selMarca.innerHTML = '<option value="">Error al cargar</option>';
-    console.error(err);
-  }
-
-  // ---------- Autocompletado por cédula ----------
-  const cedulaInput = container.querySelector('#f-cedula');
-  const cedulaHint = container.querySelector('#cedula-hint');
-  cedulaInput.addEventListener('blur', async () => {
-    const cedula = cedulaInput.value.replace(/\D/g, '');
-    if (cedula.length < 4) return;
-    cedulaHint.textContent = '🔍 Buscando cliente…';
-    cedulaHint.classList.remove('hidden');
-    try {
-      const cliente = await buscarClientePorCedula(cedula);
-      if (cliente) {
-        const nombreEl = container.querySelector('#f-nombre');
-        const celEl = container.querySelector('#f-celular');
-        const correoEl = container.querySelector('#f-correo');
-        if (!nombreEl.value.trim()) nombreEl.value = cliente.nombre || '';
-        if (!celEl.value.trim()) celEl.value = cliente.celular || '';
-        if (!correoEl.value.trim()) correoEl.value = cliente.correo || '';
-        cedulaHint.textContent = `✅ Cliente encontrado: ${cliente.nombre || ''}`;
-      } else {
-        cedulaHint.classList.add('hidden');
-      }
-    } catch (err) {
-      console.error(err);
-      cedulaHint.classList.add('hidden');
-    }
-  });
-
-  // ---------- Foto ----------
-  let fotoDataUrl = '';
-  container.querySelector('#f-foto').addEventListener('change', (evt) => {
-    const file = evt.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      fotoDataUrl = e.target.result;
-      const img = container.querySelector('#foto-preview');
-      img.src = fotoDataUrl;
-      img.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // ---------- Firma (canvas) ----------
-  const canvas = container.querySelector('#firma-canvas');
-  const ctx = canvas.getContext('2d');
-  let dibujando = false;
-  let hayFirma = false;
-
-  function prepararCanvas() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * ratio;
-    canvas.height = rect.height * ratio;
-    ctx.scale(ratio, ratio);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, rect.width, rect.height);
-    ctx.lineWidth = 2.2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#16202b';
-  }
-  prepararCanvas();
-
-  function posicion(evt) {
-    const rect = canvas.getBoundingClientRect();
-    const x = evt.touches ? evt.touches[0].clientX : evt.clientX;
-    const y = evt.touches ? evt.touches[0].clientY : evt.clientY;
-    return { x: x - rect.left, y: y - rect.top };
-  }
-  function iniciar(evt) {
-    dibujando = true;
-    hayFirma = true;
-    const p = posicion(evt);
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    evt.preventDefault();
-  }
-  function continuar(evt) {
-    if (!dibujando) return;
-    const p = posicion(evt);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-    evt.preventDefault();
-  }
-  function terminar() {
-    dibujando = false;
-  }
-  canvas.addEventListener('mousedown', iniciar);
-  canvas.addEventListener('mousemove', continuar);
-  canvas.addEventListener('mouseup', terminar);
-  canvas.addEventListener('mouseleave', terminar);
-  canvas.addEventListener('touchstart', iniciar, { passive: false });
-  canvas.addEventListener('touchmove', continuar, { passive: false });
-  canvas.addEventListener('touchend', terminar);
-
-  container.querySelector('#btn-limpiar-firma').addEventListener('click', () => {
-    const rect = canvas.getBoundingClientRect();
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, rect.width, rect.height);
-    hayFirma = false;
-  });
-
-  // ---------- Envío ----------
-  const alertBox = container.querySelector('#ingreso-alert');
-  function mostrarErrores(lista) {
-    alertBox.innerHTML = `<strong>Revisa lo siguiente:</strong><ul class="ml-4 list-disc">${lista
-      .map((e) => `<li>${e}</li>`)
-      .join('')}</ul>`;
-    alertBox.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  container.querySelector('#ingreso-form').addEventListener('submit', async (evt) => {
-    evt.preventDefault();
-    alertBox.classList.add('hidden');
-
-    const form = {
-      nombre: container.querySelector('#f-nombre').value.trim(),
-      cedula: cedulaInput.value.replace(/\D/g, ''),
-      celular: container.querySelector('#f-celular').value.replace(/\D/g, ''),
-      emailUser: container.querySelector('#f-correo').value.trim(),
-      equipo: container.querySelector('#f-equipo').value.trim(),
-      tipoEquipoId: container.querySelector('#f-tipo').value || null,
-      marcaId: container.querySelector('#f-marca').value || null,
-      accesorios: [...container.querySelectorAll('.accesorio:checked')].map((c) => c.value),
-      fallas: container.querySelector('#f-fallas').value.trim(),
-      observaciones: container.querySelector('#f-observaciones').value.trim(),
-      firmaDataUrl: hayFirma ? canvas.toDataURL('image/png') : '',
-      fotoDataUrl
-    };
-
-    const errores = [];
-    if (!form.nombre) errores.push('El nombre es obligatorio.');
-    if (!form.cedula) errores.push('La cédula debe contener solo números.');
-    if (!form.celular) errores.push('El celular debe contener solo números.');
-    if (!form.equipo) errores.push('Describe el equipo.');
-    if (!form.tipoEquipoId) errores.push('Selecciona el tipo de equipo.');
-    if (!form.marcaId) errores.push('Selecciona la marca.');
-    if (!hayFirma) errores.push('Falta la firma del cliente.');
-    if (errores.length) return mostrarErrores(errores);
-
-    const btn = container.querySelector('#btn-guardar');
-    btn.disabled = true;
-    btn.textContent = 'Guardando…';
-
-    try {
-      const res = await crearIngreso(form);
-      renderConfirmacion(container, res, navigate);
-    } catch (err) {
-      console.error(err);
-      mostrarErrores([err.message || 'Error inesperado al guardar.']);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Guardar ingreso';
-    }
-  });
-}
-
-function waLink(celular, texto) {
-  let digits = String(celular || '').replace(/\D/g, '');
-  if (!digits) return '';
-  if (digits.length === 10) digits = '57' + digits;
-  return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(texto);
-}
-
-function renderConfirmacion(container, res, navigate) {
-  container.querySelector('#ingreso-form').classList.add('hidden');
-  const mensaje =
-    `Hola ${res.nombre} 👋\n` +
-    `Tu equipo *${res.equipo}* fue registrado en *VIP TECHNOLOGY*.\n\n` +
-    `🧾 Código de Caso: *${res.codigo}*\n` +
-    `📅 Fecha de ingreso: ${res.fechaIngreso}\n\n` +
-    `Pronto uno de nuestros técnicos se comunicará contigo.\n\n` +
-    `Guarda este código, lo necesitarás para reclamar tu equipo.\n` +
-    `¡Gracias por confiar en nosotros!`;
-
-  const confirmacion = container.querySelector('#confirmacion');
-  confirmacion.classList.remove('hidden');
-  confirmacion.innerHTML = `
-    <div class="rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-      <div class="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">✓</div>
-      <h3 class="text-lg font-bold text-slate-900">Equipo registrado</h3>
-      <p class="mb-3 text-sm text-slate-500">Entrega este código al cliente, lo necesitará para reclamar el equipo.</p>
-      <div class="mx-auto mb-3 max-w-xs rounded-md bg-accent-soft py-2 font-mono text-base font-bold text-accent-dark">${res.codigo}</div>
-      <div class="mx-auto mb-1 flex max-w-xs justify-between text-sm"><span class="text-slate-500">Cliente</span><span>${res.nombre}</span></div>
-      <div class="mx-auto mb-1 flex max-w-xs justify-between text-sm"><span class="text-slate-500">Equipo</span><span>${res.equipo}</span></div>
-      <div class="mx-auto mb-1 flex max-w-xs justify-between text-sm"><span class="text-slate-500">Entrega estimada</span><span>${res.fechaEntrega}</span></div>
-
-      <label class="${labelCls} mt-4 block text-left">Mensaje para el cliente (editable)</label>
-      <textarea id="mensaje-wa" class="${inputCls} min-h-[120px] text-left">${mensaje}</textarea>
-
-      <div class="mt-4 flex flex-col gap-2">
-        <button id="btn-wa" class="rounded-md bg-[#25D366] py-2.5 text-sm font-bold text-white">📲 Enviar por WhatsApp</button>
-        <button id="btn-otro" class="rounded-md bg-accent py-2.5 text-sm font-bold text-white">Registrar otro equipo</button>
-        <button id="btn-menu" class="rounded-md border border-slate-300 py-2.5 text-sm font-bold text-slate-600">Volver al menú</button>
-      </div>
+    <div id="ing-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 p-4">
+      <div id="ing-modal-card" class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-2xl"></div>
     </div>
   `;
 
-  confirmacion.querySelector('#btn-wa').addEventListener('click', () => {
-    const texto = confirmacion.querySelector('#mensaje-wa').value.trim();
-    const link = waLink(res.celular, texto);
-    if (!link) return alert('No hay un celular válido para enviar el WhatsApp.');
-    window.open(link, '_blank');
+  container.querySelector('[data-back]').addEventListener('click', () => navigate('menu'));
+  container.querySelector('#btn-nuevo').addEventListener('click', () => navigate('ingresoForm'));
+
+  let todos = [];
+  let sortCol = 'fecha_ingreso';
+  let sortAsc = false;
+  let pagina = 1;
+  const porPagina = 12;
+  const alertBox = container.querySelector('#ing-alert');
+
+  try {
+    todos = await listarTickets();
+  } catch (err) {
+    console.error(err);
+    alertBox.textContent = 'No se pudieron cargar los ingresos: ' + err.message;
+    alertBox.classList.remove('hidden');
+    return;
+  }
+
+  function metricas() {
+    const cont = (pred) => todos.filter(pred).length;
+    const tarjetas = [
+      ['Total', todos.length, 'border-slate-400'],
+      ['Ingresados', cont((t) => t.estado === 'INGRESADO'), 'border-sky-400'],
+      ['En soporte', cont((t) => t.estado === 'EN PROCESO' || t.estado === 'REVISADO'), 'border-amber-400'],
+      ['Listos', cont((t) => t.estado === 'LISTO'), 'border-green-400'],
+      ['Entregados', cont((t) => t.estado === 'ENTREGADO'), 'border-indigo-400']
+    ];
+    container.querySelector('#ing-metricas').innerHTML = tarjetas
+      .map(
+        ([label, val, borde]) => `
+      <div class="rounded-lg border-l-4 ${borde} border-y border-r border-slate-200 bg-white p-3 shadow-sm">
+        <div class="text-xl font-extrabold text-slate-900">${val}</div>
+        <div class="text-xs uppercase text-slate-500">${label}</div>
+      </div>`
+      )
+      .join('');
+  }
+
+  function filtrarOrdenar() {
+    const q = container.querySelector('#ing-busqueda').value.toLowerCase().trim();
+    const estadoFiltro = container.querySelector('#ing-filtro-estado').value;
+    const desde = container.querySelector('#ing-desde').value;
+    const hasta = container.querySelector('#ing-hasta').value;
+
+    let filas = todos.filter((t) => {
+      const texto = `${t.codigo} ${t.cliente?.nombre || ''} ${t.equipo}`.toLowerCase();
+      const cumpleBusqueda = !q || texto.includes(q);
+
+      let cumpleEstado = true;
+      if (estadoFiltro !== 'TODOS') {
+        cumpleEstado =
+          estadoFiltro === 'PROCESO' ? t.estado === 'EN PROCESO' || t.estado === 'REVISADO' : t.estado === estadoFiltro;
+      }
+
+      let cumpleFecha = true;
+      if (desde || hasta) {
+        const f = t.fecha_ingreso ? new Date(t.fecha_ingreso) : null;
+        if (!f) cumpleFecha = false;
+        else {
+          if (desde && f < new Date(desde + 'T00:00:00')) cumpleFecha = false;
+          if (hasta && f > new Date(hasta + 'T23:59:59')) cumpleFecha = false;
+        }
+      }
+      return cumpleBusqueda && cumpleEstado && cumpleFecha;
+    });
+
+    filas.sort((a, b) => {
+      // Los INGRESADO recientes primero, igual que en legacy.
+      const aIng = a.estado === 'INGRESADO' ? 0 : 1;
+      const bIng = b.estado === 'INGRESADO' ? 0 : 1;
+      if (aIng !== bIng) return aIng - bIng;
+
+      let va, vb;
+      if (sortCol === 'cliente') {
+        va = a.cliente?.nombre || '';
+        vb = b.cliente?.nombre || '';
+      } else if (sortCol === 'estado') {
+        va = a.estado || '';
+        vb = b.estado || '';
+      } else {
+        va = a.fecha_ingreso || '';
+        vb = b.fecha_ingreso || '';
+      }
+      return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+    });
+
+    return filas;
+  }
+
+  function renderTabla() {
+    const filas = filtrarOrdenar();
+    const total = filas.length;
+    const inicio = (pagina - 1) * porPagina;
+    const fin = Math.min(inicio + porPagina, total);
+    const slice = filas.slice(inicio, fin);
+
+    container.querySelector('#ing-pag-info').textContent =
+      total === 0 ? 'Sin registros' : `Registros ${inicio + 1} al ${fin} de ${total}`;
+    container.querySelector('#ing-prev').disabled = pagina <= 1;
+    container.querySelector('#ing-next').disabled = fin >= total;
+
+    const tbody = container.querySelector('#ing-tbody');
+    if (!slice.length) {
+      tbody.innerHTML = `<tr><td colspan="11" class="px-3 py-8 text-center text-slate-400">Ningún ticket bajo este criterio.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = slice
+      .map((t) => {
+        const obs = t.observacion_final || '—';
+        const obsTrunc = obs.length > 36 ? obs.slice(0, 36) + '…' : obs;
+        return `
+      <tr class="cursor-pointer border-t border-slate-100 hover:bg-slate-50" data-id="${t.id}">
+        <td class="px-2 py-2 text-center">${waIconLink(t.cliente?.celular || t.celular)}</td>
+        <td class="px-3 py-2 text-xs text-slate-500">${fmtFecha(t.fecha_ingreso)}</td>
+        <td class="px-3 py-2 font-mono text-xs">${t.codigo}</td>
+        <td class="px-3 py-2 font-semibold">${t.cliente?.nombre || '—'}</td>
+        <td class="px-3 py-2">${t.cliente?.celular || t.celular || '—'}</td>
+        <td class="px-3 py-2">${t.equipo}</td>
+        <td class="px-3 py-2">${t.tecnico?.nombre || '<span class="italic text-slate-400">Sin asignar</span>'}</td>
+        <td class="max-w-[160px] truncate px-3 py-2 text-xs">${t.fallas || '—'}</td>
+        <td class="px-3 py-2 font-mono text-xs font-semibold text-green-700">${fmtCosto(t.costo)}</td>
+        <td class="px-3 py-2 text-xs text-slate-500">${obsTrunc}</td>
+        <td class="px-3 py-2">${badge(t.estado)}</td>
+      </tr>`;
+      })
+      .join('');
+
+    tbody.querySelectorAll('tr[data-id]').forEach((tr) => {
+      tr.addEventListener('click', () => abrirModal(Number(tr.dataset.id)));
+    });
+  }
+
+  container.querySelector('#ing-busqueda').addEventListener('input', () => {
+    pagina = 1;
+    renderTabla();
   });
-  confirmacion.querySelector('#btn-otro').addEventListener('click', () => navigate('ingresos'));
-  confirmacion.querySelector('#btn-menu').addEventListener('click', () => navigate('menu'));
+  container.querySelector('#ing-filtro-estado').addEventListener('change', () => {
+    pagina = 1;
+    renderTabla();
+  });
+  container.querySelector('#ing-desde').addEventListener('change', renderTabla);
+  container.querySelector('#ing-hasta').addEventListener('change', renderTabla);
+  container.querySelector('#ing-prev').addEventListener('click', () => {
+    pagina -= 1;
+    renderTabla();
+  });
+  container.querySelector('#ing-next').addEventListener('click', () => {
+    pagina += 1;
+    renderTabla();
+  });
+  container.querySelectorAll('th[data-sort]').forEach((th) => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      sortAsc = sortCol === col ? !sortAsc : true;
+      sortCol = col;
+      renderTabla();
+    });
+  });
+
+  // ---------------------------------------------------------------- modal --
+  const modal = container.querySelector('#ing-modal');
+  const modalCard = container.querySelector('#ing-modal-card');
+
+  function cerrarModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  function abrirModal(id) {
+    const t = todos.find((x) => x.id === id);
+    if (!t) return;
+    const yaEntregado = t.estado === 'ENTREGADO';
+
+    modalCard.innerHTML = `
+      <div class="mb-3 flex items-start justify-between">
+        <span class="font-mono text-xs text-slate-400">Ticket: ${t.codigo}</span>
+        <button data-close class="text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">Fecha registro</span>${fmtFecha(t.fecha_ingreso)}</div>
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">Estado</span>${badge(t.estado)}</div>
+        <div class="col-span-2"><span class="block text-[10px] font-bold uppercase text-slate-400">Cliente</span><b>${t.cliente?.nombre || '—'}</b></div>
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">Celular</span>${t.cliente?.celular || t.celular || '—'}</div>
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">Marca</span>${t.marca?.nombre || '—'}</div>
+        <div class="col-span-2"><span class="block text-[10px] font-bold uppercase text-slate-400">Equipo</span>${t.equipo}</div>
+        <div class="col-span-2"><span class="block text-[10px] font-bold uppercase text-slate-400">Falla reportada</span>${t.fallas || 'Sin fallas reportadas.'}</div>
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">💰 Costo</span><b class="text-green-700">${fmtCosto(t.costo)}</b></div>
+        <div><span class="block text-[10px] font-bold uppercase text-slate-400">Estado actual</span>${badge(t.estado)}</div>
+        <div class="col-span-2"><span class="block text-[10px] font-bold uppercase text-slate-400">📝 Observación final</span>${t.observacion_final || 'Sin observación registrada.'}</div>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-2 border-t border-slate-200 pt-4">
+        <button id="btn-entregar" class="rounded-md bg-green-600 py-2.5 text-sm font-bold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500">
+          ${yaEntregado ? '✅ Ya fue marcado como ENTREGADO' : '📦 Marcar como ENTREGADO y guardar'}
+        </button>
+        <button id="btn-wa-entrega" class="rounded-md bg-[#25D366] py-2.5 text-sm font-bold text-white hover:opacity-90">
+          💬 Notificar entrega por WhatsApp
+        </button>
+        <p id="ing-entregado-msg" class="hidden text-center text-xs font-semibold text-green-700">✅ Equipo marcado como ENTREGADO correctamente.</p>
+      </div>
+    `;
+    modalCard.querySelector('#btn-entregar').disabled = yaEntregado;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    modalCard.querySelector('[data-close]').addEventListener('click', cerrarModal);
+
+    modalCard.querySelector('#btn-entregar').addEventListener('click', async () => {
+      const btn = modalCard.querySelector('#btn-entregar');
+      btn.disabled = true;
+      btn.textContent = '⏳ Guardando…';
+      try {
+        await marcarTicketEntregado(t.id);
+        t.estado = 'ENTREGADO';
+        metricas();
+        renderTabla();
+        btn.textContent = '✅ Ya fue marcado como ENTREGADO';
+        modalCard.querySelector('#ing-entregado-msg').classList.remove('hidden');
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = '📦 Marcar como ENTREGADO y guardar';
+        alert('No se pudo guardar: ' + err.message);
+      }
+    });
+
+    modalCard.querySelector('#btn-wa-entrega').addEventListener('click', () => {
+      const celular = t.cliente?.celular || t.celular;
+      const digits = String(celular || '').replace(/\D/g, '');
+      if (!digits) return alert('Este registro no tiene número de celular registrado.');
+      const ahora = new Date();
+      const fechaHora =
+        String(ahora.getDate()).padStart(2, '0') +
+        '/' +
+        String(ahora.getMonth() + 1).padStart(2, '0') +
+        '/' +
+        ahora.getFullYear() +
+        ', ' +
+        String(ahora.getHours()).padStart(2, '0') +
+        ':' +
+        String(ahora.getMinutes()).padStart(2, '0');
+      const msj =
+        `Hola ${t.cliente?.nombre || 'Cliente'} 👋, te confirmamos que tu equipo ${t.equipo} ` +
+        `(Ticket: ${t.codigo}) fue entregado satisfactoriamente el ${fechaHora}. ¡Gracias por confiar en nosotros!`;
+      const num = digits.length === 10 ? '57' + digits : digits;
+      window.open(`https://wa.me/${num}?text=${encodeURIComponent(msj)}`, '_blank');
+    });
+  }
+
+  metricas();
+  renderTabla();
 }

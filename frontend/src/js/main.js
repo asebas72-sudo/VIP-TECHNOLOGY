@@ -1,7 +1,12 @@
 import { login, logout, obtenerSesion, obtenerPerfilActual } from './auth.js';
 import { navigate } from './router.js';
+import { LOGO_DATA_URL } from './logo.js';
 
-const loginModal = document.getElementById('login-modal');
+document.getElementById('login-logo').src = LOGO_DATA_URL;
+document.getElementById('header-logo').src = LOGO_DATA_URL;
+
+const loginScreen = document.getElementById('login-screen');
+const appShell = document.getElementById('app-shell');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 const loginBtn = document.getElementById('login-btn');
@@ -11,13 +16,15 @@ const mainContent = document.getElementById('main-content');
 
 async function mostrarApp() {
   const perfil = await obtenerPerfilActual();
-  loginModal.classList.add('hidden');
+  loginScreen.classList.add('hidden');
+  appShell.classList.remove('hidden');
   userBadge.textContent = perfil ? `${perfil.nombre} · ${perfil.rol}` : '';
   await navigate('menu', mainContent);
 }
 
 function mostrarLogin() {
-  loginModal.classList.remove('hidden');
+  appShell.classList.add('hidden');
+  loginScreen.classList.remove('hidden');
 }
 
 loginForm.addEventListener('submit', async (evt) => {

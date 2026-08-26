@@ -10,32 +10,44 @@
 </head>
 <body class="bg-slate-100 text-slate-900 font-sans">
 
-  <!-- Modal de login -->
-  <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/85 backdrop-blur-sm">
-    <form id="login-form" class="w-full max-w-sm rounded-xl bg-white p-8 shadow-2xl">
-      <h2 class="text-xl font-extrabold text-slate-900">Iniciar sesión</h2>
-      <p class="mb-5 text-sm text-slate-500">VIP TECHNOLOGY</p>
+  <!-- Pantalla de login: vista completa e independiente, no un modal encima del menú -->
+  <div id="login-screen"
+       class="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4"
+       style="background: radial-gradient(circle at top, #9333ea 0%, #581c87 45%, #1e0a33 100%);">
+    <div class="w-full max-w-sm">
+      <div class="mb-6 flex flex-col items-center text-center">
+        <img id="login-logo" alt="VIP Technology" class="mb-3 h-20 w-20 rounded-2xl border-2 border-white/30 object-cover shadow-xl" />
+        <span class="text-2xl font-extrabold tracking-wide text-white">VIP TECHNOLOGY</span>
+        <span class="text-xs font-medium text-purple-200">Servicio Técnico Especializado</span>
+      </div>
 
-      <div id="login-error" class="mb-3 hidden text-sm text-red-600"></div>
+      <form id="login-form" class="rounded-2xl bg-white p-8 shadow-2xl">
+        <h2 class="text-lg font-extrabold text-slate-900">Iniciar sesión</h2>
+        <p class="mb-5 text-sm text-slate-500">Ingresa tus credenciales para continuar</p>
 
-      <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-usuario">Usuario</label>
-      <input id="login-usuario" type="text" required autocomplete="username"
-             class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent focus:outline-none" />
+        <div id="login-error" class="mb-3 hidden rounded-md bg-red-50 px-3 py-2 text-sm text-red-600"></div>
 
-      <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-clave">Contraseña</label>
-      <input id="login-clave" type="password" required autocomplete="current-password"
-             class="mb-5 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent focus:outline-none" />
+        <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-usuario">Usuario</label>
+        <input id="login-usuario" type="text" required autocomplete="username" placeholder="Ej: admin"
+               class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft" />
 
-      <button id="login-btn" type="submit"
-              class="w-full rounded-md bg-accent py-2.5 text-sm font-bold text-white transition hover:bg-accent-dark">
-        Ingresar
-      </button>
-    </form>
+        <label class="mb-1 block text-xs font-bold uppercase text-slate-500" for="login-clave">Contraseña</label>
+        <input id="login-clave" type="password" required autocomplete="current-password" placeholder="••••••••"
+               class="mb-5 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft" />
+
+        <button id="login-btn" type="submit"
+                class="w-full rounded-md bg-accent py-3 text-sm font-bold text-white shadow-lg shadow-accent/30 transition hover:bg-accent-dark">
+          Ingresar
+        </button>
+      </form>
+      <p class="mt-5 text-center text-xs text-purple-200">© VIP TECHNOLOGY — Todos los derechos reservados</p>
+    </div>
   </div>
 
-  <!-- Shell de la app -->
-  <div id="app-shell" class="mx-auto max-w-4xl px-4 pb-16 pt-6">
+  <!-- Shell de la app: solo visible después de iniciar sesión -->
+  <div id="app-shell" class="mx-auto hidden max-w-4xl px-4 pb-16 pt-6">
     <header class="mb-6 flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+      <img id="header-logo" alt="VIP Technology" class="h-10 w-10 rounded-lg border border-slate-200 object-cover" />
       <div class="flex flex-col">
         <span class="text-lg font-extrabold tracking-wide text-slate-900">VIP TECHNOLOGY</span>
         <span class="text-xs font-medium text-slate-500">Servicio Técnico Especializado</span>

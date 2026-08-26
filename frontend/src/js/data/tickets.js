@@ -117,6 +117,17 @@ export async function listarTickets() {
   return (data || []).map((t) => ({ ...t, fotos: (t.fotos || []).sort((a, b) => a.orden - b.orden) }));
 }
 
+/**
+ * Marca un ticket como ENTREGADO. Equivalente a actualizarEstado() de
+ * legacy/Code.js (se usa desde el dashboard de Ingresos).
+ */
+export async function marcarTicketEntregado(id) {
+  const { data, error } = await supabase.from('tickets').update({ estado: 'ENTREGADO' }).eq('id', id).select('id').maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('No tienes permiso para modificar este ticket.');
+  return true;
+}
+
 const MAX_FOTOS = 5;
 
 /**

@@ -1,7 +1,7 @@
 const PAGINAS = {
   menu: () => import('./pages/menu.js'),
+  ingresos: () => import('./pages/ingresos.js'),
   // Se activan uno a uno en los próximos pasos de la migración:
-  ingresos: () => import('./pages/proximamente.js'),
   reparaciones: () => import('./pages/proximamente.js'),
   asesorias: () => import('./pages/proximamente.js')
 };

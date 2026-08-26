@@ -82,7 +82,7 @@ export async function render(container, { navigate }) {
     <div id="ase-alert" class="mb-3 hidden rounded-md bg-red-50 p-3 text-sm text-red-700"></div>
 
     <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table class="w-full min-w-[900px] text-left text-sm">
+      <table class="tabla-responsive w-full min-w-[900px] text-left text-sm">
         <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
           <tr>
             <th class="px-2 py-2 text-center">WA</th>
@@ -210,17 +210,17 @@ export async function render(container, { navigate }) {
         const tecnico = tecnicos.find((t) => t.id === a.tecnico_id);
         return `
       <tr class="cursor-pointer border-t border-slate-100 hover:bg-slate-50" data-id="${a.id}">
-        <td class="px-2 py-2 text-center">${waIconCell(a.cliente?.celular || a.celular)}</td>
-        <td class="px-3 py-2 text-xs text-slate-500">${fmtFecha(a.fecha_ingreso)}</td>
-        <td class="px-3 py-2 font-mono text-xs">#${a.id}</td>
-        <td class="px-3 py-2 font-semibold">${a.cliente?.nombre || '—'}</td>
-        <td class="px-3 py-2">${a.cliente?.celular || a.celular || '—'}</td>
-        <td class="px-3 py-2">${a.solicitud || '—'}</td>
-        <td class="px-3 py-2">${tecnico?.nombre || '<span class="italic text-slate-400">Sin asignar</span>'}</td>
-        <td class="px-3 py-2 text-xs">${fmtFechaHora(a.fecha_visita)}</td>
-        <td class="max-w-[160px] truncate px-3 py-2 text-xs">${detalleTrunc}</td>
-        <td class="px-3 py-2 font-mono text-xs font-semibold text-green-700">${fmtCosto(a.costo)}</td>
-        <td class="px-3 py-2">${badge(a.estado)}</td>
+        <td class="wa-cell px-2 py-2 text-center">${waIconCell(a.cliente?.celular || a.celular)}</td>
+        <td data-label="Fecha" class="px-3 py-2 text-xs text-slate-500">${fmtFecha(a.fecha_ingreso)}</td>
+        <td data-label="ID" class="px-3 py-2 font-mono text-xs">#${a.id}</td>
+        <td data-label="Cliente" class="px-3 py-2 font-semibold">${a.cliente?.nombre || '—'}</td>
+        <td data-label="Celular" class="px-3 py-2">${a.cliente?.celular || a.celular || '—'}</td>
+        <td data-label="Solicitud" class="px-3 py-2">${a.solicitud || '—'}</td>
+        <td data-label="Técnico" class="px-3 py-2">${tecnico?.nombre || '<span class="italic text-slate-400">Sin asignar</span>'}</td>
+        <td data-label="F. Visita" class="px-3 py-2 text-xs">${fmtFechaHora(a.fecha_visita)}</td>
+        <td data-label="Detalle" class="max-w-[160px] truncate px-3 py-2 text-xs">${detalleTrunc}</td>
+        <td data-label="Costo" class="px-3 py-2 font-mono text-xs font-semibold text-green-700">${fmtCosto(a.costo)}</td>
+        <td data-label="Estado" class="px-3 py-2">${badge(a.estado)}</td>
       </tr>`;
       })
       .join('');

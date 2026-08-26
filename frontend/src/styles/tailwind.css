@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Tabla → tarjetas en celular, igual que en legacy/*Dashboard.html.
+ * Uso: <table class="tabla-responsive"> con <td data-label="..."> en cada celda
+ * (la celda del ícono de WhatsApp lleva class="wa-cell" y sin data-label).
+ * Por debajo de 768px cada <tr> se convierte en una tarjeta apilada en vez de
+ * una fila angosta con scroll horizontal.
+ */
+@media (max-width: 768px) {
+  .tabla-responsive thead {
+    display: none;
+  }
+  .tabla-responsive,
+  .tabla-responsive tbody,
+  .tabla-responsive tr,
+  .tabla-responsive td {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+  }
+  .tabla-responsive tr {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .tabla-responsive tr:last-child {
+    margin-bottom: 0;
+  }
+  .tabla-responsive td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+    white-space: normal !important;
+    max-width: none !important;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 9px 12px;
+  }
+  .tabla-responsive td:last-child {
+    border-bottom: none;
+  }
+  .tabla-responsive td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+  }
+  .tabla-responsive td.wa-cell {
+    justify-content: flex-end;
+    background: #f8fafc;
+  }
+  .tabla-responsive td.wa-cell::before {
+    content: none;
+  }
+}

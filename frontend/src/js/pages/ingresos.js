@@ -1,4 +1,5 @@
 import { listarTickets, marcarTicketEntregado } from '../data/tickets.js';
+import { waIconCell, waLink } from '../../lib/whatsapp.js';
 
 const COLOR_ESTADO = {
   INGRESADO: 'bg-sky-100 text-sky-700',
@@ -22,14 +23,6 @@ function fmtFecha(iso) {
 function fmtCosto(v) {
   if (!v && v !== 0) return '—';
   return '$ ' + Number(v).toLocaleString('es-CO');
-}
-
-function waIconLink(celular) {
-  const digits = String(celular || '').replace(/\D/g, '');
-  const icono = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12.004 2C6.48 2 2 6.48 2 12c0 1.908.533 3.69 1.454 5.215L2 22l4.93-1.39A9.957 9.957 0 0 0 12.004 22c5.523 0 10-4.48 10-10s-4.477-10-10-10zm0 1.5c4.694 0 8.5 3.806 8.5 8.5s-3.806 8.5-8.5 8.5c-1.636 0-3.155-.465-4.453-1.266l-.32-.2-.228.064-2.73.768.784-2.646-.07-.246A8.448 8.448 0 0 1 3.5 12c0-4.694 3.806-8.5 8.5-8.5z" fill="#25D366"/></svg>`;
-  if (!digits) return `<span class="inline-flex h-7 w-7 items-center justify-center opacity-30">${icono}</span>`;
-  const num = digits.length === 10 ? '57' + digits : digits;
-  return `<a href="https://wa.me/${num}" target="_blank" rel="noopener" title="Escribir por WhatsApp" onclick="event.stopPropagation()" class="inline-flex h-7 w-7 items-center justify-center transition hover:scale-110">${icono}</a>`;
 }
 
 const ESTADOS_FILTRO = [
@@ -215,7 +208,7 @@ export async function render(container, { navigate }) {
         const obsTrunc = obs.length > 36 ? obs.slice(0, 36) + '…' : obs;
         return `
       <tr class="cursor-pointer border-t border-slate-100 hover:bg-slate-50" data-id="${t.id}">
-        <td class="px-2 py-2 text-center">${waIconLink(t.cliente?.celular || t.celular)}</td>
+        <td class="px-2 py-2 text-center">${waIconCell(t.cliente?.celular || t.celular)}</td>
         <td class="px-3 py-2 text-xs text-slate-500">${fmtFecha(t.fecha_ingreso)}</td>
         <td class="px-3 py-2 font-mono text-xs">${t.codigo}</td>
         <td class="px-3 py-2 font-semibold">${t.cliente?.nombre || '—'}</td>
@@ -330,8 +323,6 @@ export async function render(container, { navigate }) {
 
     modalCard.querySelector('#btn-wa-entrega').addEventListener('click', () => {
       const celular = t.cliente?.celular || t.celular;
-      const digits = String(celular || '').replace(/\D/g, '');
-      if (!digits) return alert('Este registro no tiene número de celular registrado.');
       const ahora = new Date();
       const fechaHora =
         String(ahora.getDate()).padStart(2, '0') +
@@ -346,8 +337,9 @@ export async function render(container, { navigate }) {
       const msj =
         `Hola ${t.cliente?.nombre || 'Cliente'} 👋, te confirmamos que tu equipo ${t.equipo} ` +
         `(Ticket: ${t.codigo}) fue entregado satisfactoriamente el ${fechaHora}. ¡Gracias por confiar en nosotros!`;
-      const num = digits.length === 10 ? '57' + digits : digits;
-      window.open(`https://wa.me/${num}?text=${encodeURIComponent(msj)}`, '_blank');
+      const link = waLink(celular, msj);
+      if (!link) return alert('Este registro no tiene número de celular registrado.');
+      window.open(link, '_blank');
     });
   }
 
